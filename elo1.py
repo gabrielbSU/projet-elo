@@ -3,6 +3,11 @@ import math
 class Elo:
     """
     Implémentation simplifiée du système de classement Elo.
+    
+    Attributs:
+    score: Current Elo rating
+    parties_jouees: Number of games played
+    historique: List of Elo ratings over times
     """
     
     def __init__(self, score_initial=1200):
@@ -80,7 +85,7 @@ if __name__ == "__main__":
     print(f"Joueur 1: {joueur1.score_actuel()} ({joueur1.categorie()})")
     print(f"Joueur 2: {joueur2.score_actuel()} ({joueur2.categorie()})")
 
-#    === Scores initiaux ===
+#=== Scores initiaux ===
 #Joueur 1: 1200 (Intermédiaire)
 #Joueur 2: 1400 (Intermédiaire)
 
