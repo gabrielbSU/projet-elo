@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import norm
 from outils import Outils
+from joueur import Joueur 
 
 # Définir la plage de différences de forces (Delta f)
 delta_f = np.linspace(-10, 10, 1000)  # De -10 à 10 pour couvrir un large éventail de différences
@@ -36,3 +37,16 @@ print("\nVariabilité des résultats avec le facteur de hasard :")
 for _ in range(10):
     proba = Outils.probabilite_victoire_avec_hasard(f1, f2, sigma, sigma_hasard)
     print(f"Probabilité de victoire : {proba:.2f}")
+
+# Génération de 5 joueurs aléatoires
+joueurs = []
+for i in range(5):
+    nom = f"Joueur{i+1}"
+    prenom = f"Prénom{i+1}"
+    joueur = Joueur.generer_joueur(nom, prenom)
+    joueurs.append(joueur)
+
+# Affichage des joueurs générés
+for joueur in joueurs:
+    joueur.afficher_joueur()
+    print("-" * 40)

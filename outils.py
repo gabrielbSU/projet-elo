@@ -36,4 +36,5 @@ class Outils:
         delta_f_ajuste = delta_f + epsilon
         proba = norm.cdf(delta_f_ajuste, loc=0, scale=sigma)  # sigma = 1 pour la gaussienne
         return proba
+        
 

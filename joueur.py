@@ -4,6 +4,7 @@ from outils import Outils
 from scipy.stats import norm
 import random
 import math
+import seaborn as sns
 
 class Joueur:
     """
@@ -15,7 +16,7 @@ class Joueur:
         self.nom = nom
         self.prenom = prenom
         self.age = age
-        self.comp = comp  # comp est une liste de 5 compétences dont le coeff est la position dans la liste.
+        self.comp = comp  # comp est une liste de 5 compétences dont le coeff est la position dans la liste. Chaque compétence prend une valeur entre 0 et 10
         self.histo_partie = histo_partie  # Liste des résultats des parties (-1: défaite, 0: nul, 1: victoire)
         self.histo_tournoi = histo_tournoi  # Liste des résultats des tournois
         self.elo = elo  # Niveau de jeu du joueur (elo)
@@ -44,6 +45,8 @@ class Joueur:
         print(f"Age : {self.age}")
         print(f"Compétences : {self.comp}")
         print(f"Elo : {self.elo}")
+        print(f"Historique des parties : {self.histo_partie}")
+        print(f"Historique des tournois : {self.histo_tournoi}")
 
     def force_joueur(self):
         """
@@ -120,3 +123,118 @@ class Joueur:
         rencontre = self.rencontre(joueur_adverse)
         proba_elo = 1 / (1 + 10 ** (-((self.elo - joueur_adverse.elo) / 400)))
         return ((rencontre == 1 and proba_elo > 0.5) or (rencontre == 0 and proba_elo == 0.5) or (rencontre == -1 and proba_elo < 0.5))
+    
+    @staticmethod
+    def generer_joueur(nom, prenom):
+        """
+        Génère un joueur avec des caractéristiques aléatoires selon différentes distributions :
+        Compétences : log-normale (plus adapté qu'une gaussienne car on a plus de joueurs faibles et moyens que fort).
+        Age : gaussienne
+        elo : log-normale (plus adapté qu'une gaussienne car on a plus de joueurs faibles et moyens que fort).
+        Il est important de noter que la génération des compétences et indépendantes de celle de l'elo
+        """
+        # Génération de l'âge (entre 15 et 40 ans)
+        age = int(np.random.normal(loc=25, scale=5))  # Moyenne = 25, écart-type = 5
+        age = max(15, min(age, 40))  # On s'assure que l'âge reste dans [15, 40]
+
+        # Génération des compétences (5 compétences entre 0 et 10)
+        comp = []
+        for _ in range(5):
+            competence = np.random.lognormal(mean=1.0, sigma=0.5)
+            # Normalisation pour avoir une valeur entre 0 et 10
+            competence = max(0, min(competence, 10))
+            comp.append(round(competence, 1))
+
+        # Génération de l'elo avec une distribution log-normale
+        mean = 6.5  # Moyenne du logarithme des valeurs
+        sigma = 0.5  # Écart-type du logarithme des valeurs
+        elo = np.random.lognormal(mean=mean, sigma=sigma)
+        elo = 800 + (elo / 10) * 1600  # On ajuste pour avoir une plage [800, 2400]
+        elo = min(elo, 2400)  # On s'assure que l'elo ne dépasse pas 2400
+
+        # Historique des parties et tournois (initialement vides)
+        histo_partie = []
+        histo_tournoi = []
+
+        return Joueur(nom, prenom, age, comp, histo_partie, histo_tournoi, int(elo))
+    
+    @staticmethod
+    def tracer_competences(joueurs):
+        """
+        Trace l'histogramme et la densité des compétences des joueurs.
+        """
+        # Extraction des compétences de tous les joueurs
+        competences = []
+        for joueur in joueurs:
+            competences.extend(joueur.comp)  # On ajoute toutes les compétences de chaque joueur
+
+        # Création du graphique
+        plt.figure(figsize=(10, 6))
+        
+        # Histogramme des compétences
+        sns.histplot(competences, bins=20, color='blue', alpha=0.5, label='Histogramme', kde=False)
+        
+        # Courbe de densité des compétences
+        sns.kdeplot(competences, color='red', label='Densité', linewidth=2)
+        
+        # Ajout des labels et de la légende
+        plt.title("Distribution des compétences des joueurs")
+        plt.xlabel("Compétences")
+        plt.ylabel("Fréquence / Densité")
+        plt.legend()
+        plt.grid(True)
+        plt.show()
+        
+    @staticmethod
+    def tracer_elo(joueurs):
+        """
+        Trace l'histogramme et la densité des elo des joueurs.
+        """
+        # Extraction des elo de tous les joueurs
+        elo = [joueur.elo for joueur in joueurs]
+
+        # Création du graphique
+        plt.figure(figsize=(10, 6))
+        
+        # Histogramme des elo
+        sns.histplot(elo, bins=20, color='green', alpha=0.5, label='Histogramme', kde=False)
+        
+        # Courbe de densité des elo
+        sns.kdeplot(elo, color='orange', label='Densité', linewidth=2)
+        
+        # Ajout des labels et de la légende
+        plt.title("Distribution des elo des joueurs")
+        plt.xlabel("Elo")
+        plt.ylabel("Fréquence / Densité")
+        plt.legend()
+        plt.grid(True)
+        plt.show()
+
+    @staticmethod
+    def tracer_competences_et_elo(joueurs):
+        """
+        Trace les densités des compétences et des elo sur le même graphique.
+        """
+        # Extraction des compétences et des elo
+        competences = []
+        elo = []
+        for joueur in joueurs:
+            competences.extend(joueur.comp)
+            elo.append(joueur.elo)
+
+        # Création du graphique
+        plt.figure(figsize=(10, 6))
+        
+        # Densité des compétences
+        sns.kdeplot(competences, color='blue', label='Compétences', linewidth=2)
+        
+        # Densité des elo (normalisée pour la comparaison)
+        sns.kdeplot(elo, color='green', label='Elo', linewidth=2)
+        
+        # Ajout des labels et de la légende
+        plt.title("Comparaison des densités des compétences et des elo")
+        plt.xlabel("Valeur")
+        plt.ylabel("Densité")
+        plt.legend()
+        plt.grid(True)
+        plt.show()
