@@ -2,6 +2,8 @@ from joueur import Joueur
 
 # Génération d'une liste de joueurs
 joueurs = [Joueur.generer_joueur(f"Joueur{i}", f"Prénom{i}") for i in range(1000)]
+for j in joueurs : 
+    print(j.get_elo())
 
 # Tracé des compétences
 Joueur.tracer_competences(joueurs)

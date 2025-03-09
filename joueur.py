@@ -48,6 +48,9 @@ class Joueur:
         print(f"Historique des parties : {self.histo_partie}")
         print(f"Historique des tournois : {self.histo_tournoi}")
 
+    def get_elo(self):
+        return self.elo
+
     def force_joueur(self):
         """
         Retourne la force d'un joueur entre 0 et 1.
@@ -149,7 +152,7 @@ class Joueur:
         mean = 6.5  # Moyenne du logarithme des valeurs
         sigma = 0.5  # Écart-type du logarithme des valeurs
         elo = np.random.lognormal(mean=mean, sigma=sigma)
-        elo = 800 + (elo / 10) * 1600  # On ajuste pour avoir une plage [800, 2400]
+        elo = 800 + (elo - np.min(elo)) / (np.max(elo) - np.min(elo)) * 1600  # Normalisation linéaire
         elo = min(elo, 2400)  # On s'assure que l'elo ne dépasse pas 2400
 
         # Historique des parties et tournois (initialement vides)
