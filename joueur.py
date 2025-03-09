@@ -134,7 +134,7 @@ class Joueur:
         Compétences : log-normale (plus adapté qu'une gaussienne car on a plus de joueurs faibles et moyens que fort).
         Age : gaussienne
         elo : log-normale (plus adapté qu'une gaussienne car on a plus de joueurs faibles et moyens que fort).
-        Il est important de noter que la génération des compétences et indépendantes de celle de l'elo
+        Il est important de noter que la génération des compétences et indépendante de celle de l'elo.
         """
         # Génération de l'âge (entre 15 et 40 ans)
         age = int(np.random.normal(loc=25, scale=5))  # Moyenne = 25, écart-type = 5
@@ -152,8 +152,13 @@ class Joueur:
         mean = 6.5  # Moyenne du logarithme des valeurs
         sigma = 0.5  # Écart-type du logarithme des valeurs
         elo = np.random.lognormal(mean=mean, sigma=sigma)
-        elo = 800 + (elo - np.min(elo)) / (np.max(elo) - np.min(elo)) * 1600  # Normalisation linéaire
-        elo = min(elo, 2400)  # On s'assure que l'elo ne dépasse pas 2400
+        
+        # Normalisation de l'elo entre 800 et 2400
+        # On utilise des valeurs fixes pour la normalisation
+        elo_min = np.exp(mean - 3 * sigma)  # Valeur minimale théorique de la distribution log-normale
+        elo_max = np.exp(mean + 3 * sigma)  # Valeur maximale théorique de la distribution log-normale
+        elo = 800 + (elo - elo_min) / (elo_max - elo_min) * 1600  # Normalisation linéaire
+        elo = max(800, min(elo, 2400))  # On s'assure que l'elo reste dans [800, 2400]
 
         # Historique des parties et tournois (initialement vides)
         histo_partie = []
@@ -175,7 +180,7 @@ class Joueur:
         plt.figure(figsize=(10, 6))
         
         # Histogramme des compétences
-        sns.histplot(competences, bins=20, color='blue', alpha=0.5, label='Histogramme', kde=False)
+        sns.histplot(competences, bins=20, color='blue', alpha=0.5, label='Histogramme', kde=True)
         
         # Courbe de densité des compétences
         sns.kdeplot(competences, color='red', label='Densité', linewidth=2)
@@ -187,7 +192,7 @@ class Joueur:
         plt.legend()
         plt.grid(True)
         plt.show()
-        
+
     @staticmethod
     def tracer_elo(joueurs):
         """
@@ -200,7 +205,7 @@ class Joueur:
         plt.figure(figsize=(10, 6))
         
         # Histogramme des elo
-        sns.histplot(elo, bins=20, color='green', alpha=0.5, label='Histogramme', kde=False)
+        sns.histplot(elo, bins=20, color='green', alpha=0.5, label='Histogramme', kde=True)
         
         # Courbe de densité des elo
         sns.kdeplot(elo, color='orange', label='Densité', linewidth=2)
@@ -231,7 +236,7 @@ class Joueur:
         # Densité des compétences
         sns.kdeplot(competences, color='blue', label='Compétences', linewidth=2)
         
-        # Densité des elo (normalisée pour la comparaison)
+        # Densité des elo
         sns.kdeplot(elo, color='green', label='Elo', linewidth=2)
         
         # Ajout des labels et de la légende
