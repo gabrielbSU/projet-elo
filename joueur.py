@@ -80,23 +80,12 @@ class Joueur:
             # Si la différence entre les 2 forces est trop élevée, le hasard n'a pas d'impact
             sigma_hasard = 0
         else:
-            # Sinon, on calcule le sigma_hasard en fonction de l'historique des joueurs
-            if len(joueur_adverse.histo_partie) >= 5 and len(self.histo_partie) >= 5:
-                tot = 0
-                for i in range(len(self.histo_partie) - 6, len(self.histo_partie)):
-                    tot += self.histo_partie[i]
-                for i in range(len(joueur_adverse.histo_partie) - 6, len(joueur_adverse.histo_partie)):
-                    tot += joueur_adverse.histo_partie[i]
-
-                valeur_aleatoire = random.uniform(-tot, tot)
-                ancien_min, ancien_max = -tot, tot
-                nouvel_min, nouvel_max = 0, 0.5
-
-                # On calcule le sigma_hasard en fonction de la valeur_aleatoire
-                sigma_hasard = (valeur_aleatoire - ancien_min) * (nouvel_max - nouvel_min) / (ancien_max - ancien_min) + nouvel_min
-            else:
-                # Sinon, on fixe que le hasard a peu d'impact
-                sigma_hasard = 0.1
+            # Initialisation de sigma_hasard selon une loi log-normale dépendant de delta_f
+            mean = -1.5 * delta_f  # Ajuster la moyenne pour que sigma_hasard soit plus petit quand delta_f est grand
+            sigma = 0.5 * (1 - delta_f)  # Ajuster l'écart-type pour que sigma_hasard soit plus petit quand delta_f est grand
+            sigma_hasard = np.random.lognormal(mean, sigma)
+            # S'assurer que sigma_hasard reste entre 0 et 0.5
+            sigma_hasard = max(0, min(sigma_hasard, 0.5))
 
         # Calcul du gagnant de la partie
         proba = Outils.probabilite_victoire_avec_hasard(f1, f2, sigma_hasard=sigma_hasard)
