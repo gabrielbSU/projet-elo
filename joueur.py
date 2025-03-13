@@ -151,9 +151,9 @@ class Joueur:
         
         # Normalisation de l'elo entre 800 et 2400
         # On utilise des valeurs fixes pour la normalisation
-        elo_min = np.exp(mean - 3 * sigma)  # Valeur minimale théorique de la distribution log-normale
-        elo_max = np.exp(mean + 3 * sigma)  # Valeur maximale théorique de la distribution log-normale
-        elo = 800 + (elo - elo_min) / (elo_max - elo_min) * 1600  # Normalisation linéaire
+        elo_min = np.exp(mean - 3 * sigma)  # Valeur minimale de la distribution log-normale
+        elo_max = np.exp(mean + 3 * sigma)  # Valeur maximale de la distribution log-normale
+        elo = 800 + (elo - elo_min) / (elo_max - elo_min) * 1600  # Normalisation 
         elo = max(800, min(elo, 2400))  # On s'assure que l'elo reste dans [800, 2400]
 
         # Historique des parties et tournois (initialement vides)
@@ -167,7 +167,7 @@ class Joueur:
         """
         Trace l'histogramme et la densité des compétences des joueurs.
         """
-        # Extraction des compétences de tous les joueurs
+        # On récupére les compétences de tous les joueurs
         competences = []
         for joueur in joueurs:
             competences.extend(joueur.comp)  # On ajoute toutes les compétences de chaque joueur
@@ -194,7 +194,7 @@ class Joueur:
         """
         Trace l'histogramme et la densité des elo des joueurs.
         """
-        # Extraction des elo de tous les joueurs
+        # On récupére les elos de tous les joueurs
         elo = [joueur.elo for joueur in joueurs]
 
         # Création du graphique
@@ -219,7 +219,7 @@ class Joueur:
         """
         Trace les densités des compétences et des elo sur le même graphique.
         """
-        # Extraction des compétences et des elo
+        # On récupére les compétences et des elo
         competences = []
         elo = []
         for joueur in joueurs:
