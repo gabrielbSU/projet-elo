@@ -13,3 +13,10 @@ Joueur.tracer_elo(joueurs)
 
 # Comparaison des densités des compétences et des elo
 Joueur.tracer_competences_et_elo(joueurs)
+
+# Simuler des rencontres
+for i in range(len(joueurs) - 1):
+    joueurs[i].rencontre(joueurs[i + 1])
+
+# Tracer l'évolution de sigma_hasard
+Joueur.tracer_evolution_sigma_hasard()

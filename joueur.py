@@ -12,6 +12,9 @@ class Joueur:
     On supposera que le jeu est un jeu individuel donc un joueur est un objet unique de la classe Joueur.
     """
 
+    sigma_hasard_values = []
+    delta_f_values = []
+
     def __init__(self, nom, prenom, age, comp, histo_partie, histo_tournoi, elo):
         self.nom = nom
         self.prenom = prenom
@@ -86,6 +89,10 @@ class Joueur:
             sigma_hasard = np.random.lognormal(mean, sigma)
             # S'assurer que sigma_hasard reste entre 0 et 0.5
             sigma_hasard = max(0, min(sigma_hasard, 0.5))
+
+        # Stocker les valeurs de sigma_hasard et delta_f
+        Joueur.sigma_hasard_values.append(sigma_hasard)
+        Joueur.delta_f_values.append(delta_f)
 
         # Calcul du gagnant de la partie
         proba = Outils.probabilite_victoire_avec_hasard(f1, f2, sigma_hasard=sigma_hasard)
@@ -233,5 +240,18 @@ class Joueur:
         plt.xlabel("Valeur")
         plt.ylabel("Densité")
         plt.legend()
+        plt.grid(True)
+        plt.show()
+
+    @staticmethod
+    def tracer_evolution_sigma_hasard():
+        """
+        Trace l'évolution de sigma_hasard en fonction de delta_f.
+        """
+        plt.figure(figsize=(10, 6))
+        plt.scatter(Joueur.delta_f_values, Joueur.sigma_hasard_values, alpha=0.5)
+        plt.title("Évolution de sigma_hasard en fonction de delta_f")
+        plt.xlabel("delta_f")
+        plt.ylabel("sigma_hasard")
         plt.grid(True)
         plt.show()
