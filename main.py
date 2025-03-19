@@ -1,9 +1,4 @@
-import numpy as np
-import matplotlib.pyplot as plt
-from scipy.stats import norm
-from outils import Outils
-from joueur import Joueur 
-
+from modele_joueur import np, norm, plt, Joueur, probabilite_victoire, probabilite_victoire_avec_hasard
 # Définir la plage de différences de forces (Delta f)
 delta_f = np.linspace(-10, 10, 1000)  # De -10 à 10 pour couvrir un large éventail de différences
 
@@ -29,13 +24,13 @@ sigma = 1  # Écart-type de la gaussienne
 sigma_hasard = 0.2  # Écart-type du facteur de hasard (doit être dans [0, 0.5])
 
 # Calcul de la probabilité de victoire avec facteur de hasard
-proba_victoire = Outils.probabilite_victoire_avec_hasard(f1, f2, sigma, sigma_hasard)
+proba_victoire = probabilite_victoire_avec_hasard(f1, f2, sigma, sigma_hasard)
 print(f"Probabilité que le joueur 1 gagne avec facteur de hasard : {proba_victoire:.2f}")
 
 # Exécuter la fonction plusieurs fois pour observer la variabilité
 print("\nVariabilité des résultats avec le facteur de hasard :")
 for _ in range(10):
-    proba = Outils.probabilite_victoire_avec_hasard(f1, f2, sigma, sigma_hasard)
+    proba = probabilite_victoire_avec_hasard(f1, f2, sigma, sigma_hasard)
     print(f"Probabilité de victoire : {proba:.2f}")
 
 # Génération de 5 joueurs aléatoires
@@ -48,5 +43,5 @@ for i in range(5):
 
 # Affichage des joueurs générés
 for joueur in joueurs:
-    joueur.afficher_joueur()
+    joueur.__str__()
     print("-" * 40)

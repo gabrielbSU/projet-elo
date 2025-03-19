@@ -1,9 +1,9 @@
-from joueur import Joueur
+from modele_joueur import np, norm, plt, Joueur, probabilite_victoire, probabilite_victoire_avec_hasard
 
 # Génération d'une liste de joueurs
 joueurs = [Joueur.generer_joueur(f"Joueur{i}", f"Prénom{i}") for i in range(1000)]
 for j in joueurs : 
-    print(j.get_elo())
+    print(j.elo)
 
 # Tracé des compétences
 Joueur.tracer_competences(joueurs)
