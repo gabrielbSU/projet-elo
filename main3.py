@@ -18,7 +18,7 @@ for joueur in joueurs:
     joueur.__str__()
 
 # Organiser un tournoi à élimination directe
-for i in range(300):
+for i in range():
     classement = tournoi_eliminatoire(joueurs)
 
 # Afficher le classement du tournoi

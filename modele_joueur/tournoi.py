@@ -33,6 +33,8 @@ def tournoi_round_robin(joueurs):
 def tournoi_eliminatoire(joueurs):
     """
     Organise un tournoi à élimination directe et renvoie le classement des joueurs.
+    Dans ce tournoi, seuls les gagnants passent au tour suivant, et donc il n'y a pas de rencontres des perdants. 
+    Attention, le nombre de joueurs doit être multiple de 8.
     
     joueurs: Liste des joueurs participant au tournoi
     """
