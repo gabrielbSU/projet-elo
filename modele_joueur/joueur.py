@@ -170,6 +170,17 @@ def tracer_competences_et_elo(joueurs):
 
 #Dans la fonction de rencontre suivante, on a choisit de modéliser la probabilité de victoire par une loi sigmoide.
 #Cette loi est plus adaptée pour une répartition homogène du hasard
+def mettre_a_jour_elo(joueur1, joueur2, S1, S2, P1, P2):
+    """
+    Met à jour l'elo des deux joueurs après une partie.
+    """
+    joueur1.elo = joueur1.elo + K * (S1 - P1)
+    joueur2.elo = joueur2.elo + K * (S2 - P2)
+
+    # Mise à jour de l'historique des parties
+    joueur1.histo_partie.append(S1)
+    joueur2.histo_partie.append(S2)
+
 def rencontre_sigmoide(joueur1, joueur2):
     """
     Simule une partie entre deux joueurs et met à jour :
@@ -179,7 +190,7 @@ def rencontre_sigmoide(joueur1, joueur2):
     f1, f2 = joueur1.force_joueur(), joueur2.force_joueur()
 
     # Calcul du gagnant de la partie et du perdant de la partie
-    (P1,P2) = tirage_victoire_sigmoide(f1, f2)
+    (P1, P2) = tirage_victoire_sigmoide(f1, f2)
 
     # Tirage final selon les probabilités calculées avec un facteur de hasard
     tirage = np.random.rand()  # Tirage aléatoire entre 0 et 1
@@ -191,14 +202,7 @@ def rencontre_sigmoide(joueur1, joueur2):
         S2 = 1  # Joueur 2 gagne
 
     # Mise à jour de l'elo
-    joueur1.elo = joueur1.elo + K * (S1 - P1)
-    joueur2.elo = joueur2.elo + K * (S2 - P2)
-
-    # Mise à jour de l'historique des parties
-    joueur1.histo_partie.append(S1)
-    joueur2.histo_partie.append(S2)
-
-
+    mettre_a_jour_elo(joueur1, joueur2, S1, S2, P1, P2)
 
 #Dans la fonction de rencontre suivante, on a choisit de modéliser la probabilité de victoire par une loi log-normale.
 #Cette loi est plus adaptée pour modéliser la probabilité de victoire d'un joueur en fonction de sa force.
@@ -211,7 +215,7 @@ def rencontre_log_normale(joueur1, joueur2):
     f1, f2 = joueur1.force_joueur(), joueur2.force_joueur()
 
     # Calcul du gagnant de la partie et du perdant de la partie
-    (P1,P2) = tirage_victoire_log_normale(f1, f2)
+    (P1, P2) = tirage_victoire_log_normale(f1, f2)
 
     # Tirage final selon les probabilités calculées avec un facteur de hasard
     tirage = np.random.rand()  # Tirage aléatoire entre 0 et 1
@@ -223,11 +227,6 @@ def rencontre_log_normale(joueur1, joueur2):
         S2 = 1  # Joueur 2 gagne
 
     # Mise à jour de l'elo
-    joueur1.elo = joueur1.elo + K * (S1 - P1)
-    joueur2.elo = joueur2.elo + K * (S2 - P2)
-
-    # Mise à jour de l'historique des parties
-    joueur1.histo_partie.append(S1)
-    joueur2.histo_partie.append(S2)
+    mettre_a_jour_elo(joueur1, joueur2, S1, S2, P1, P2)
 
 
