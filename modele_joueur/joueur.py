@@ -4,7 +4,7 @@ from scipy.stats import norm
 import random
 import math
 import seaborn as sns
-from .outils import tirage_victoire_log_normal, tirage_victoire_sigmoide
+from .outils import tirage_victoire_log_normal, tirage_victoire_sigmoide, sigmoid
 
 K = 30 #Facteur de dévellopement (il nous permet de moduler l'impact d'un match sur l'elo d'un joueur)
 
@@ -181,18 +181,30 @@ def mettre_a_jour_elo(joueur1, joueur2, S1, S2, P1, P2):
     joueur1.histo_partie.append(S1)
     joueur2.histo_partie.append(S2)
 
-def rencontre_sigmoide(joueur1, joueur2):
+def rencontre_sigmoide(joueur1, joueur2, jeu):
     """
     Simule une partie entre deux joueurs et met à jour :
     - leurs elos respectifs.
     - leurs historiques de parties. 
+    
+    Le taux de hasard du jeu influence la fonction sigmoïde pour ajuster l'impact de la différence de forces.
+    
+    taux_de_hasard : Taux de hasard du jeu qui ajuste le facteur de lissage de la sigmoïde.
     """
     f1, f2 = joueur1.force_joueur(), joueur2.force_joueur()
 
-    # Calcul du gagnant de la partie et du perdant de la partie
-    (P1, P2) = tirage_victoire_sigmoide(f1, f2)
+    # Calcul de la différence de forces
+    diff = f1 - f2
+    
+    # Ajustement du facteur de lissage 'k' en fonction du taux de hasard du jeu
+    # Plus le taux de hasard est élevé, plus le facteur de lissage est faible
+    k_adjusted = 10 * (1 - jeu.taux_de_hasard)  # Quand taux_de_hasard=0, k = 10; Quand taux_de_hasard=1, k = 0
+    
+    # Calcul de la probabilité de victoire pour le joueur 1
+    P1 = sigmoid(diff, k=k_adjusted)
+    P2 = 1 - P1  # Probabilité de victoire pour le joueur 2
 
-    # Tirage final selon les probabilités calculées avec un facteur de hasard
+    # Tirage aléatoire pour déterminer le gagnant
     tirage = np.random.rand()  # Tirage aléatoire entre 0 et 1
     if tirage < P1:
         S1 = 1  # Joueur 1 gagne
@@ -201,8 +213,10 @@ def rencontre_sigmoide(joueur1, joueur2):
         S1 = 0  # Joueur 1 perd
         S2 = 1  # Joueur 2 gagne
 
-    # Mise à jour de l'elo
+    # Mise à jour des Elo des joueurs (en supposant que la fonction mettre_a_jour_elo est déjà définie)
     mettre_a_jour_elo(joueur1, joueur2, S1, S2, P1, P2)
+
+    return S1, S2
 
 #Dans la fonction de rencontre suivante, on a choisit de modéliser la probabilité de victoire par une loi log-normale.
 #Cette loi est plus adaptée pour modéliser la probabilité de victoire d'un joueur en fonction de sa force.
