@@ -5,6 +5,7 @@ import random
 import math
 import seaborn as sns
 from .outils import tirage_victoire_log_normal, tirage_victoire_sigmoide, sigmoid
+from .jeu import Jeu
 
 K = 30 #Facteur de dévellopement (il nous permet de moduler l'impact d'un match sur l'elo d'un joueur)
 
@@ -168,8 +169,7 @@ def tracer_competences_et_elo(joueurs):
     plt.grid(True)
     plt.show()
 
-#Dans la fonction de rencontre suivante, on a choisit de modéliser la probabilité de victoire par une loi sigmoide.
-#Cette loi est plus adaptée pour une répartition homogène du hasard
+#Fonction qui met à jour l'elo des joueurs après une partie
 def mettre_a_jour_elo(joueur1, joueur2, S1, S2, P1, P2):
     """
     Met à jour l'elo des deux joueurs après une partie.
@@ -181,6 +181,7 @@ def mettre_a_jour_elo(joueur1, joueur2, S1, S2, P1, P2):
     joueur1.histo_partie.append(S1)
     joueur2.histo_partie.append(S2)
 
+#Dans la fonction de rencontre suivante, on a choisit de modéliser la probabilité de victoire par une loi sigmoide.
 def rencontre_sigmoide(joueur1, joueur2, jeu):
     """
     Simule une partie entre deux joueurs et met à jour :
@@ -189,7 +190,7 @@ def rencontre_sigmoide(joueur1, joueur2, jeu):
     
     Le taux de hasard du jeu influence la fonction sigmoïde pour ajuster l'impact de la différence de forces.
     
-    taux_de_hasard : Taux de hasard du jeu qui ajuste le facteur de lissage de la sigmoïde.
+    jeu: objet de la classe Jeu qui contient le taux de hasard du jeu.
     """
     f1, f2 = joueur1.force_joueur(), joueur2.force_joueur()
 
@@ -198,10 +199,10 @@ def rencontre_sigmoide(joueur1, joueur2, jeu):
     
     # Ajustement du facteur de lissage 'k' en fonction du taux de hasard du jeu
     # Plus le taux de hasard est élevé, plus le facteur de lissage est faible
-    k_adjusted = 10 * (1 - jeu.taux_de_hasard)  # Quand taux_de_hasard=0, k = 10; Quand taux_de_hasard=1, k = 0
+    k_hasard = 10 * (1 - jeu.taux_de_hasard) 
     
     # Calcul de la probabilité de victoire pour le joueur 1
-    P1 = sigmoid(diff, k=k_adjusted)
+    P1 = sigmoid(diff, k=k_hasard)
     P2 = 1 - P1  # Probabilité de victoire pour le joueur 2
 
     # Tirage aléatoire pour déterminer le gagnant
@@ -213,7 +214,7 @@ def rencontre_sigmoide(joueur1, joueur2, jeu):
         S1 = 0  # Joueur 1 perd
         S2 = 1  # Joueur 2 gagne
 
-    # Mise à jour des Elo des joueurs (en supposant que la fonction mettre_a_jour_elo est déjà définie)
+    # Mise à jour des Elo des joueurs et de leur historique de parties
     mettre_a_jour_elo(joueur1, joueur2, S1, S2, P1, P2)
 
     return S1, S2
@@ -243,4 +244,36 @@ def rencontre_log_normale(joueur1, joueur2):
     # Mise à jour de l'elo
     mettre_a_jour_elo(joueur1, joueur2, S1, S2, P1, P2)
 
+def tracer_evolution_proba_victoire(jeu, joueur1, joueur2):
+    """
+    Trace l'évolution de la probabilité de victoire du joueur 1 en fonction du taux de hasard du jeu.
+    
+    jeu : Objet de la classe Jeu, contenant le taux de hasard.
+    joueur1 : Objet de la classe Joueur (le joueur 1).
+    joueur2 : Objet de la classe Joueur (le joueur 2).
+    """
+    # Forces des joueurs
+    f1 = joueur1.force_joueur()
+    f2 = joueur2.force_joueur()
+    
+    # Créer une gamme de taux de hasard pour tracer l'évolution
+    taux_hasard_values = np.linspace(0, 1, 100)  # 100 valeurs entre 0 et 1
 
+    # Liste pour stocker les probabilités de victoire du joueur 1
+    proba_victoire_joueur1 = []
+    
+    # Calculer la probabilité de victoire pour chaque taux de hasard
+    for taux_hasard in taux_hasard_values:
+        jeu.taux_de_hasard = taux_hasard  # Mettre à jour le taux de hasard du jeu
+        P1, P2 = tirage_victoire_sigmoide(f1, f2, k=10 * (1 - taux_hasard))  # Ajuster selon le taux de hasard
+        proba_victoire_joueur1.append(P1)  # Ajouter la probabilité de victoire du joueur 1
+    
+    # Tracer la courbe
+    plt.figure(figsize=(10, 6))
+    plt.plot(taux_hasard_values, proba_victoire_joueur1, label="Probabilité de victoire Joueur 1", color='blue')
+    plt.title(f'Évolution de la probabilité de victoire du Joueur 1 en fonction du taux de hasard')
+    plt.xlabel('Taux de hasard')
+    plt.ylabel('Probabilité de victoire')
+    plt.grid(True)
+    plt.legend()
+    plt.show()

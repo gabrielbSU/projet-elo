@@ -9,8 +9,3 @@ class Jeu:
     def afficher_details(self):
         print(f"Nom du jeu: {self.nom}")
         print(f"Taux de hasard: {self.taux_de_hasard}")
-
-# Exemple d'utilisation
-jeu = Jeu("Poker", 0.5)
-jeu.afficher_details()
-

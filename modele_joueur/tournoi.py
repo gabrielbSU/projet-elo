@@ -1,7 +1,7 @@
 import random
 from .joueur import rencontre_sigmoide, generer_joueur
 
-def tournoi_round_robin(joueurs):
+def tournoi_round_robin(joueurs,jeu):
     """
     Organise un tournoi round robin où chaque joueur rencontre tous les autres joueurs une fois.
     Met à jour les elos et les historiques des parties des joueurs après chaque rencontre.
@@ -14,7 +14,7 @@ def tournoi_round_robin(joueurs):
     n = len(joueurs)
     for i in range(n):
         for j in range(i + 1, n):
-            rencontre_sigmoide(joueurs[i], joueurs[j])
+            rencontre_sigmoide(joueurs[i], joueurs[j], jeu)
             # Mettre à jour le compteur de victoires
             if joueurs[i].histo_partie[-1] == 1:
                 victoires[joueurs[i]] += 1

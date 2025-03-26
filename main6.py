@@ -9,8 +9,8 @@ from modele_joueur import sigmoid, np, plt, sns
 x = np.linspace(-1, 1, 200)  # Augmenter le nombre de points de 100 à 200
 
 # Taux de hasard pour plusieurs scénarios
-taux_de_hasard_values = [0.1, 0.5, 0.8]  # Taux de hasard faible, moyen et élevé
-k_values = [10, 5, 2]  # Facteur k ajusté en fonction du taux de hasard (faible k = plus de hasard)
+taux_de_hasard_values = [0.1, 0.5, 0.8, 0.9, 1]  # Taux de hasard faible, moyen et élevé
+k_values = [9, 6, 2, 1, 0]  # Facteur k ajusté en fonction du taux de hasard (faible k = plus de hasard)
 
 plt.figure(figsize=(10, 6))
 
