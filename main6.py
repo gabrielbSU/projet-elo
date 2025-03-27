@@ -5,17 +5,17 @@ from modele_joueur import sigmoid, np, plt, sns
 
 
 
-# Différence de forces entre les joueurs (de -1 à 1)
+# Difference de forces entre les joueurs (de -1 à 1)
 x = np.linspace(-1, 1, 200)  # Augmenter le nombre de points de 100 à 200
 
 # Taux de hasard pour plusieurs scénarios
-taux_de_hasard_values = [0.1, 0.5, 0.8, 0.9, 1]  # Taux de hasard faible, moyen et élevé
-k_values = [9, 6, 2, 1, 0]  # Facteur k ajusté en fonction du taux de hasard (faible k = plus de hasard)
+taux_de_hasard_values = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]  # Taux de hasard faible, moyen et élevé
+k_values = [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]  # Facteur k ajusté en fonction du taux de hasard (faible k = plus de hasard)
 
 plt.figure(figsize=(10, 6))
 
 for taux, k in zip(taux_de_hasard_values, k_values):
-    # Tracé de la courbe sigmoïde pour chaque taux de hasard
+    # Trace de la sigmoide pour chaque taux de hasard
     plt.plot(x, sigmoid(x, k), label=f"Taux de hasard = {taux}")
 
 plt.title("Impact du taux de hasard sur la probabilité de victoire")
