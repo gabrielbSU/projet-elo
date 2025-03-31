@@ -169,7 +169,7 @@ def tracer_competences_et_elo(joueurs):
     plt.grid(True)
     plt.show()
 
-#Fonction qui met à jour l'elo des joueurs après une partie
+#Fonction qui met à jour l'elo des joueurs après une partie  #à mettre dans outils
 def mettre_a_jour_elo(joueur1, joueur2, S1, S2, P1, P2):
     """
     Met à jour l'elo des deux joueurs après une partie.
