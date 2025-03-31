@@ -1,0 +1,1 @@
+K = 30 #Facteur de dévellopement (il nous permet de moduler l'impact d'un match sur l'elo d'un joueur)

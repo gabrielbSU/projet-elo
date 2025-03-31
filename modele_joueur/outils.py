@@ -1,4 +1,5 @@
 import numpy as np
+from .constantes import K
 
 def tirage_victoire_log_normal(f1, f2, mu=0, sigma_base=0.1):
     """
@@ -52,21 +53,18 @@ def tirage_victoire_sigmoide(f1, f2, k=10):
 
     return (P1,P2)
 
+#Fonction qui met à jour l'elo des joueurs après une partie  #à mettre dans outils
+def mettre_a_jour_elo(joueur1, joueur2, S1, S2, P1, P2):
+    from .joueur import Joueur  #import dans la fonction pour pas avoir de pb de circular import
+    """
+    Met à jour l'elo des deux joueurs après une partie.
+    """
+    elo1 = joueur1.histo_elo[-1] + K * (S1 - P1)
+    elo2 = joueur2.histo_elo[-1] + K * (S2 - P2)
 
-def main():
-    # Test des fonctions avec des valeurs d'exemple
-    f1 = 0.7
-    f2 = 0.5
-    
-    print("Test de tirage_victoire_log_normal:")
-    for _ in range(5):
-        result = tirage_victoire_log_normal(f1, f2)
-        print(f"Résultat: Joueur {result} gagne")
-    
-    print("\nTest de tirage_victoire_sigmoide:")
-    for _ in range(5):
-        result = tirage_victoire_sigmoide(f1, f2)
-        print(f"Résultat: Joueur {result} gagne")
+    # Mise à jour de l'historique des parties
+    joueur1.histo_partie.append(S1)
+    joueur2.histo_partie.append(S2)
 
-if __name__ == "__main__":
-    main()
+    joueur1.histo_elo.append(elo1)
+    joueur2.histo_elo.append(elo2)
