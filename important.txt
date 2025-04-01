@@ -1,0 +1,20 @@
+attention faire attention au tirage de la proba pour le gagnant et le perdant dans la fonction tirage sigmoide :
+
+    # Tirage aléatoire pour déterminer le gagnant
+    tirage = np.random.rand()  # Tirage aléatoire entre 0 et 1
+    if tirage < P1:
+        S1 = 1  # Joueur 1 gagne
+        S2 = 0  # Joueur 2 perd
+    else:
+        S1 = 0  # Joueur 1 perd
+        S2 = 1  # Joueur 2 gagne
+
+
+        ou alors 
+
+    if(P1 >= P2):
+        S1 = 1
+        S2 = 0
+    else:
+        S1 = 0
+        S2 = 1

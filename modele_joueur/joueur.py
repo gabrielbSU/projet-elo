@@ -99,14 +99,12 @@ def rencontre_sigmoide(joueur1, joueur2, jeu):
     P1 = sigmoid(diff, k=k_hasard)
     P2 = 1 - P1  # Probabilité de victoire pour le joueur 2
 
-    # Tirage aléatoire pour déterminer le gagnant
-    tirage = np.random.rand()  # Tirage aléatoire entre 0 et 1
-    if tirage < P1:
-        S1 = 1  # Joueur 1 gagne
-        S2 = 0  # Joueur 2 perd
+    if(P1 >= P2):
+        S1 = 1
+        S2 = 0
     else:
-        S1 = 0  # Joueur 1 perd
-        S2 = 1  # Joueur 2 gagne
+        S1 = 0
+        S2 = 1
 
     # Mise à jour des Elo des joueurs et de leur historique de parties
     mettre_a_jour_elo(joueur1, joueur2, S1, S2, P1, P2)

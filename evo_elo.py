@@ -1,7 +1,7 @@
 from modele_joueur import tracer_competences, tracer_elo, generer_joueur, tournoi_round_robin, plt, Jeu, tracer_force_elo, tracer_comparaison_evolution_elo, tracer_evolution_elo
 
 # Génération de joueurs aléatoires
-nombres_joueurs = 20  # Nombre de joueurs à générer
+nombres_joueurs = 10  # Nombre de joueurs à générer
 joueurs = [generer_joueur(f"Joueur{i+1}", f"Prenom{i+1}") for i in range(nombres_joueurs)]
 
 # Affichage initial des courbes
@@ -14,7 +14,7 @@ tracer_elo(joueurs)
 
 
 # Simulation de plusieurs tournois avec la fonction round robin
-n_tournois = 100  # Nombre de tournois à simuler
+n_tournois = 10  # Nombre de tournois à simuler
 jeu = Jeu('Poker',0.1)  # Assurez-vous de définir ce paramètre en fonction du jeu
 
 for t in range(1, n_tournois + 1):
@@ -30,6 +30,7 @@ for t in range(1, n_tournois + 1):
 
 #tracer_force_elo(joueurs)
 
-print("force joueur 0 : ", joueurs[0].force_joueur())
-tracer_evolution_elo(joueurs[0])
+#print("force joueur 0 : ", joueurs[0].force_joueur())
+#tracer_evolution_elo(joueurs[0])
 
+tracer_comparaison_evolution_elo(joueurs)
