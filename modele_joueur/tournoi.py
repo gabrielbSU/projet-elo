@@ -48,7 +48,7 @@ def tournoi_eliminatoire(joueurs):
             if i + 1 < len(joueurs):
                 joueur1 = joueurs[i]
                 joueur2 = joueurs[i + 1]
-                rencontre_sigmoide(joueur1, joueur2)
+                rencontre_sigmoide(joueur1, joueur2,jeu)
                 if joueur1.histo_partie[-1] == 1:
                     tour_suiv.append(joueur1)
                     classement.append(joueur2)

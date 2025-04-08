@@ -1,4 +1,4 @@
-from modele_joueur import tracer_competences, tracer_elo, generer_joueur, tournoi_round_robin, plt, Jeu, tracer_force_elo, tracer_comparaison_evolution_elo, tracer_evolution_elo, tournoi_round_robin_modele2
+from modele_joueur import *
 
 # Génération de joueurs aléatoires
 nombres_joueurs = 30  # Nombre de joueurs à générer

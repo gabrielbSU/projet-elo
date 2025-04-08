@@ -6,6 +6,6 @@ class Jeu:
         self.nom = nom
         self.taux_de_hasard = taux_de_hasard
 
-    def afficher_details(self):
+    def __str__(self):
         print(f"Nom du jeu: {self.nom}")
         print(f"Taux de hasard: {self.taux_de_hasard}")
