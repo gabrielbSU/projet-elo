@@ -1,6 +1,4 @@
-from modele_joueur.joueur import generer_joueur, tracer_competences, tracer_evolution_proba_victoire
-from modele_joueur.jeu import Jeu
-from modele_joueur.tournoi import tournoi_round_robin, afficher_classement
+from modele_joueur import Joueur, generer_joueur, Jeu, tournoi_round_robin, afficher_classement, tracer_competences
 
 jeu = Jeu("Poker", 0.5)
 

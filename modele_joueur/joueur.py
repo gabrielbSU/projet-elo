@@ -139,3 +139,42 @@ def rencontre_log_normale(joueur1, joueur2):
     # Ajout des nouveaux elos dans l'historique
     joueur1.histo_elo.append(joueur1.elo)
     joueur2.histo_elo.append(joueur2.elo)
+
+
+def rencontre_modele2(joueur1, joueur2, jeu):
+    """
+    Simule une partie entre deux joueurs en se basant uniquement sur leur Elo,
+    avec un lissage de la probabilité en fonction du taux de hasard du jeu.
+
+    Notons que P1_lisse = (1 - hasard) * P1 + hasard * 0.5
+    """
+    # Récupération des Elos actuels
+    elo1 = joueur1.histo_elo[-1]
+    elo2 = joueur2.histo_elo[-1]
+
+    # Calcul des probabilités (selon la formule de l'Elo)
+    P1 = 1 / (1 + 10 ** ((elo2 - elo1) / 400))
+    P2 = 1 - P1
+
+    # Lissage avec le taux de hasard du jeu
+    hasard = jeu.taux_de_hasard
+    P1_lisse = (1 - hasard) * P1 + hasard * 0.5
+    P2_lisse = 1 - P1_lisse  # Toujours cohérent
+
+    # Détermination du vainqueur selon les probabilités lissées
+    if P1_lisse >= P2_lisse:
+        S1, S2 = 1, 0  # Joueur 1 gagne
+    else:
+        S1, S2 = 0, 1  # Joueur 2 gagne
+
+    # Mise à jour des Elos
+    mettre_a_jour_elo(joueur1, joueur2, S1, S2, P1_lisse, P2_lisse)
+
+    # Mise à jour des historiques
+    joueur1.histo_partie.append(S1)
+    joueur2.histo_partie.append(S2)
+
+    joueur1.histo_elo.append(joueur1.elo)
+    joueur2.histo_elo.append(joueur2.elo)
+
+    return S1, S2
