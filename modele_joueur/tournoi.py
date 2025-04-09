@@ -30,7 +30,7 @@ def tournoi_round_robin(joueurs,jeu):
     
     return classement
 
-def tournoi_eliminatoire(joueurs):
+def tournoi_eliminatoire(joueurs,jeu):
     """
     Organise un tournoi à élimination directe et renvoie le classement des joueurs.
     Dans ce tournoi, seuls les gagnants passent au tour suivant, et donc il n'y a pas de rencontres des perdants. 
@@ -65,7 +65,7 @@ def tournoi_eliminatoire(joueurs):
     gagnant = joueurs[0]
     classement.append(gagnant)
     classement.reverse()  # Le gagnant doit être en tête du classement
-    print(f"Le gagnant du tournoi est {gagnant.nom} {gagnant.prenom} avec {gagnant.elo} Elo")
+    print(f"Le gagnant du tournoi est {gagnant.nom} {gagnant.prenom} avec {gagnant.histo_elo[-1]} Elo")
     return classement
 
 def tournoi_round_robin_modele2(joueurs,jeu):
@@ -97,7 +97,7 @@ def tournoi_round_robin_modele2(joueurs,jeu):
     
     return classement
 
-def tournoi_eliminatoire_modele2(joueurs):
+def tournoi_eliminatoire_modele2(joueurs,jeu):
     """
     Organise un tournoi à élimination directe et renvoie le classement des joueurs.
     Dans ce tournoi, seuls les gagnants passent au tour suivant, et donc il n'y a pas de rencontres des perdants. 
@@ -132,7 +132,7 @@ def tournoi_eliminatoire_modele2(joueurs):
     gagnant = joueurs[0]
     classement.append(gagnant)
     classement.reverse()  # Le gagnant doit être en tête du classement
-    print(f"Le gagnant du tournoi est {gagnant.nom} {gagnant.prenom} avec {gagnant.elo} Elo")
+    print(f"Le gagnant du tournoi est {gagnant.nom} {gagnant.prenom} avec {gagnant.histo_elo[-1]} Elo")
     return classement
 
 

@@ -14,7 +14,7 @@ tracer_elo(joueurs)
 
 
 # Simulation de plusieurs tournois avec la fonction round robin
-n_tournois = 100 # Nombre de tournois à simuler
+n_tournois = 10 # Nombre de tournois à simuler
 jeu = Jeu('Poker',0.5) 
 
 for t in range(1, n_tournois + 1):
