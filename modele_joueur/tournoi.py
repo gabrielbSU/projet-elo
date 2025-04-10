@@ -138,10 +138,10 @@ def tournoi_eliminatoire_modele2(joueurs,jeu):
 
 def afficher_classement(classement):
     """
-    Affiche le classement des joueurs après le tournoi à élimination directe.
+    Affiche le classement des joueurs après le tournoi.
     
     classement: Liste des joueurs classés par leur performance dans le tournoi
     """
-    print("Classement du tournoi à élimination directe:")
+    print("Classement du tournoi:")
     for i, joueur in enumerate(classement, start=1):
         print(f"{i}. {joueur.nom} {joueur.prenom} - {joueur.histo_elo[-1]} Elo")
