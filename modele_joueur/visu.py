@@ -1,7 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-from .joueur import Joueur
+from .joueur import Joueur, rencontre_sigmoide, ajuster_impact_hasard
+from .outils import sigmoid
 
 def tracer_competences(joueurs):
     """
@@ -122,4 +123,83 @@ def tracer_comparaison_evolution_elo(joueurs):
     plt.legend()
     plt.grid(True)
 
+    plt.show()
+
+def visualiser_plusieurs_sigmoides(k_list=[5, 10, 20, 50]):
+    """
+    Trace plusieurs fonctions sigmoïdes pour différentes valeurs de k.
+    
+    :param k_list: Liste des coefficients k à tracer.
+    """
+    x = np.linspace(-1, 1, 500)  # Différence de force de -1 à 1
+
+    plt.figure(figsize=(10, 6))
+    
+    for k in k_list:
+        y = sigmoid(x, k)
+        plt.plot(x, y, label=f'k = {k}')
+    
+    plt.title("Comparaison de plusieurs sigmoïdes (effet du paramètre k)")
+    plt.xlabel("Différence de force (force joueur 1 - force joueur 2)")
+    plt.ylabel("Probabilité de victoire pour Joueur 1")
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+
+def visualiser_sigmoide_rencontre(joueur1, joueur2, jeu):
+    """
+    Visualise la courbe sigmoïde utilisée pour déterminer la probabilité de victoire
+    entre joueur1 et joueur2, en tenant compte du lissage par l'impact du hasard.
+    """
+    # 1. Calcul du facteur de hasard k comme dans rencontre_sigmoide
+    f1 = joueur1.force_joueur()
+    f2 = joueur2.force_joueur()
+    
+    # Calcule du k_hasard utilisé
+    k_hasard = ajuster_impact_hasard(joueur1, joueur2, jeu) * (1 + abs(f1 - f2))
+
+    # 2. Génération de la courbe
+    x = np.linspace(-1, 1, 500)  # Différence de force : f1 - f2
+    y = sigmoid(x, k=k_hasard)
+
+    # 3. Affichage
+    plt.figure(figsize=(10, 6))
+    plt.plot(x, y, label=f'Sigmoïde lissée avec k = {k_hasard:.2f}')
+    plt.title("Sigmoïde réelle utilisée dans 'rencontre_sigmoide'")
+    plt.xlabel("Différence de forces (Joueur 1 - Joueur 2)")
+    plt.ylabel("Probabilité de victoire du Joueur 1")
+    plt.grid(True)
+    plt.legend()
+    plt.show()
+
+def visualiser_sigmoides_multiples(liste_paires_joueurs, jeu):
+    """
+    Visualise plusieurs courbes sigmoïdes correspondant à plusieurs paires de joueurs,
+    tenant compte du lissage par l'impact du hasard.
+
+    liste_paires_joueurs : liste de tuples (joueur1, joueur2)
+    jeu : instance du jeu
+    """
+    x = np.linspace(-1, 1, 500)  # Intervalle des différences de forces
+
+    plt.figure(figsize=(12, 8))
+    
+    for idx, (joueur1, joueur2) in enumerate(liste_paires_joueurs):
+        # Calcul du k_hasard propre à la paire
+        f1 = joueur1.force_joueur()
+        f2 = joueur2.force_joueur()
+        k_hasard = ajuster_impact_hasard(joueur1, joueur2, jeu) * (1 + abs(f1 - f2))
+
+        # Calcul de la courbe
+        y = sigmoid(x, k=k_hasard)
+        
+        # Nom pour la légende
+        label = f"{joueur1.nom} vs {joueur2.nom} (k={k_hasard:.2f})"
+        plt.plot(x, y, label=label)
+
+    plt.title("Comparaison des sigmoïdes lissées pour plusieurs paires de joueurs")
+    plt.xlabel("Différence de forces (Joueur 1 - Joueur 2)")
+    plt.ylabel("Probabilité de victoire du Joueur 1")
+    plt.grid(True)
+    plt.legend()
     plt.show()

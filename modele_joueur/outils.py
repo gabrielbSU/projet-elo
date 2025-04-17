@@ -42,7 +42,7 @@ def tirage_victoire_sigmoide(f1, f2, k=10):
     f2 : Force du joueur 2 (entre 0 et 1)
     k : Facteur de lissage pour la fonction sigmoïde
     
-    Retourne 1 si le joueur 1 gagne, 2 si le joueur 2 gagne.
+    Retourne les probas de victoires du joueur 1 et du joueur 2.
     """
     # Calcul de la différence de forces
     diff = f1 - f2
@@ -68,3 +68,9 @@ def mettre_a_jour_elo(joueur1, joueur2, S1, S2, P1, P2):
 
     joueur1.histo_elo.append(elo1)
     joueur2.histo_elo.append(elo2)
+
+def tirage_bernoulli(p):
+    """
+    Tire un 1 avec probabilité p, sinon 0, en utilisant numpy.
+    """
+    return np.random.binomial(1, p)

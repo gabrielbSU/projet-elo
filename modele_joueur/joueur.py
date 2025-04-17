@@ -4,7 +4,7 @@ from scipy.stats import norm
 import random
 import math
 import seaborn as sns
-from .outils import tirage_victoire_log_normal, tirage_victoire_sigmoide, sigmoid, mettre_a_jour_elo
+from .outils import tirage_victoire_log_normal, tirage_victoire_sigmoide, sigmoid, mettre_a_jour_elo, tirage_bernoulli
 from .jeu import Jeu
 
 
@@ -25,16 +25,14 @@ class Joueur:
         self.histo_elo = histo_elo  # Historique des Elo 
         
     def __str__(self):
-        """
-        Affiche les informations du joueur.
-        """
-        print(f"Nom : {self.nom}")
-        print(f"Prénom : {self.prenom}")
-        print(f"Age : {self.age}")
-        print(f"Compétences : {self.comp}")
-        print(f"Historique des Elos : {self.histo_elo}")
-        print(f"Historique des parties : {self.histo_partie}")
-        print(f"Historique des tournois : {self.histo_tournoi}")
+        return (f"Nom : {self.nom}\n"
+                f"Prénom : {self.prenom}\n"
+                f"Age : {self.age}\n"
+                f"Compétences : {self.comp}\n"
+                f"Historique des Elos : {self.histo_elo}\n"
+                f"Historique des parties : {self.histo_partie}\n"
+                f"Historique des tournois : {self.histo_tournoi}")
+
 
     def force_joueur(self):
         """
@@ -83,33 +81,23 @@ def rencontre_sigmoide(joueur1, joueur2, jeu):
     - leurs historiques de parties. 
     
     Le taux de hasard du jeu influence la fonction sigmoïde pour ajuster l'impact de la différence de forces.
-    
-    jeu: objet de la classe Jeu qui contient le taux de hasard du jeu.
     """
-    f1, f2 = joueur1.force_joueur(), joueur2.force_joueur()
-
-    # Calcul de la différence de forces
-    diff = f1 - f2
-    
-    # Ajustement du facteur de lissage 'k' en fonction du taux de hasard du jeu
-    # Plus le taux de hasard est élevé, plus le facteur de lissage est faible
-    k_hasard = 10 * (1 - jeu.taux_de_hasard) *(1 + abs(diff))  # Ajustement du facteur de lissage en fonction du taux de hasard et de la différence de forces
+    # Ajustement du taux de hasard basé sur les joueurs
+    k_hasard = 10*ajuster_impact_hasard(joueur1, joueur2,jeu) * (1 + abs(joueur1.force_joueur() - joueur2.force_joueur()))
     
     # Calcul de la probabilité de victoire pour le joueur 1
+    diff = joueur1.force_joueur() - joueur2.force_joueur()
     P1 = sigmoid(diff, k=k_hasard)
     P2 = 1 - P1  # Probabilité de victoire pour le joueur 2
 
-    if(P1 >= P2):
-        S1 = 1
-        S2 = 0
-    else:
-        S1 = 0
-        S2 = 1
+    S1 = tirage_bernoulli(P1)  # Tirage aléatoire selon la probabilité de victoire du joueur 1
+    S2 = 1 - S1
 
     # Mise à jour des Elo des joueurs et de leur historique de parties
     mettre_a_jour_elo(joueur1, joueur2, S1, S2, P1, P2)
-    
+
     return S1, S2
+
 
 #Dans la fonction de rencontre suivante, on a choisit de modéliser la probabilité de victoire par une loi log-normale.
 #Cette loi est plus adaptée pour modéliser la probabilité de victoire d'un joueur en fonction de sa force.
@@ -144,37 +132,65 @@ def rencontre_log_normale(joueur1, joueur2):
 def rencontre_modele2(joueur1, joueur2, jeu):
     """
     Simule une partie entre deux joueurs en se basant uniquement sur leur Elo,
-    avec un lissage de la probabilité en fonction du taux de hasard du jeu.
+    avec un lissage de la probabilité en fonction de l'impact du hasard ajusté 
+    par la fonction 'ajuster_impact_hasard' du jeu.
 
-    Notons que P1_lisse = (1 - hasard) * P1 + hasard * 0.5
+    Notons que P1_lisse = (1 - impact_hasard) * P1 + impact_hasard * 0.5
     """
     # Récupération des Elos actuels
-    elo1 = joueur1.histo_elo[-1]
-    elo2 = joueur2.histo_elo[-1]
+    elo1 = joueur1.histo_elo[-1]  # Dernier Elo du joueur 1
+    elo2 = joueur2.histo_elo[-1]  # Dernier Elo du joueur 2
 
-    # Calcul des probabilités (selon la formule de l'Elo)
-    P1 = 1 / (1 + 10 ** ((elo2 - elo1) / 400))
-    P2 = 1 - P1
+    # Calcul des probabilités selon la formule de l'Elo
+    P1 = 1 / (1 + 10 ** ((elo2 - elo1) / 400))  # Probabilité de victoire du joueur 1
+    P2 = 1 - P1  # Probabilité de victoire du joueur 2 (complémentaire)
 
-    # Lissage avec le taux de hasard du jeu
-    hasard = jeu.taux_de_hasard
-    P1_lisse = (1 - hasard) * P1 + hasard * 0.5
-    P2_lisse = 1 - P1_lisse  # Toujours cohérent
+    # Ajustement du taux de hasard en fonction des forces des joueurs via la méthode ajuster_impact_hasard
+    impact_hasard = ajuster_impact_hasard(joueur1, joueur2,jeu)
+
+    # Lissage avec l'impact ajusté du hasard
+    P1_lisse = (1 - impact_hasard) * P1 + impact_hasard * 0.5  # Lissage pour P1
+    P2_lisse = 1 - P1_lisse  # P2 est forcément l'inverse de P1
 
     # Détermination du vainqueur selon les probabilités lissées
-    if P1_lisse >= P2_lisse:
-        S1, S2 = 1, 0  # Joueur 1 gagne
-    else:
-        S1, S2 = 0, 1  # Joueur 2 gagne
+    S1 = tirage_bernoulli(P1_lisse)  # Tirage aléatoire pour le joueur 1 basé sur P1_lisse
+    S2 = 1 - S1  # Le vainqueur inverse
 
-    # Mise à jour des Elos
+    # Mise à jour des Elos des joueurs
     mettre_a_jour_elo(joueur1, joueur2, S1, S2, P1_lisse, P2_lisse)
 
     # Mise à jour des historiques
-    joueur1.histo_partie.append(S1)
-    joueur2.histo_partie.append(S2)
+    joueur1.histo_partie.append(S1)  # Ajouter le résultat pour joueur 1
+    joueur2.histo_partie.append(S2)  # Ajouter le résultat pour joueur 2
 
-    joueur1.histo_elo.append(joueur1.elo)
-    joueur2.histo_elo.append(joueur2.elo)
+    joueur1.histo_elo.append(joueur1.elo)  # Ajouter le nouvel Elo de joueur 1
+    joueur2.histo_elo.append(joueur2.elo)  # Ajouter le nouvel Elo de joueur 2
 
     return S1, S2
+
+
+
+def ajuster_impact_hasard(joueur1, joueur2, jeu):
+    """
+    Ajuste l'impact du hasard en fonction de la différence de force et des forces individuelles des joueurs.
+    
+    :param joueur1: Objet représentant le joueur 1
+    :param joueur2: Objet représentant le joueur 2
+    :return: Le taux de hasard modifié
+    """
+    
+    # Récupérer les forces des joueurs
+    f1 = joueur1.force_joueur()
+    f2 = joueur2.force_joueur()
+    
+    # Calcul de la différence de force
+    diff_force = abs(f1 - f2)
+
+    # Calcul de l'impact du hasard en fonction des forces des joueurs
+    # Si les joueurs sont faibles, le hasard a un plus grand impact
+    # Si les joueurs sont forts, le hasard a un impact plus faible
+    impact_par_force = max(1 - 0.05 * (f1 + f2), 0.1)  # Plus la somme des forces est élevée, moins le hasard est important
+    
+    # Ajustement final du taux de hasard en fonction de la différence et de l'impact des forces
+    ajustement = max(1 - 0.1 * diff_force, 0.1)  # Moins la différence est grande, plus le hasard est important
+    return jeu.taux_de_hasard * impact_par_force * ajustement * jeu.impact_hasard
