@@ -6,7 +6,7 @@ from .outils import sigmoid
 
 def tracer_competences(joueurs):
     """
-    Trace l'histogramme et la densité des compétences des joueurs.
+    Trace l'histogramme des compétences des joueurs.
     """
     if not joueurs:
         print("Aucun joueur à afficher.")
@@ -19,19 +19,17 @@ def tracer_competences(joueurs):
         return
 
     plt.figure(figsize=(10, 6))
-    sns.histplot(competences, bins=20, color='blue', alpha=0.5, label='Histogramme', kde=True)
-    sns.kdeplot(competences, color='red', label='Densité', linewidth=2)
-    
+    sns.histplot(competences, bins=20, color='blue', alpha=0.5, label='Histogramme', kde=True)    
     plt.title("Distribution des compétences des joueurs")
     plt.xlabel("Compétences")
-    plt.ylabel("Fréquence / Densité")
+    plt.ylabel("Fréquence")
     plt.legend()
     plt.grid(True)
     plt.show()
 
 def tracer_elo(joueurs):
     """
-    Trace l'histogramme et la densité des derniers Elo des joueurs.
+    Trace l'histogramme des derniers Elo des joueurs.
     """
     if not joueurs:
         print("Aucun joueur à afficher.")
@@ -45,11 +43,10 @@ def tracer_elo(joueurs):
 
     plt.figure(figsize=(10, 6))
     sns.histplot(elo, bins=20, color='green', alpha=0.5, label='Histogramme', kde=True)
-    sns.kdeplot(elo, color='orange', label='Densité', linewidth=2)
     
     plt.title("Distribution des derniers Elo des joueurs")
     plt.xlabel("Elo")
-    plt.ylabel("Fréquence / Densité")
+    plt.ylabel("Fréquence")
     plt.legend()
     plt.grid(True)
     plt.show()
@@ -71,7 +68,7 @@ def tracer_force_elo(joueurs):
     plt.figure(figsize=(10, 6))
     sns.scatterplot(x=forces, y=elos, alpha=0.7)
 
-    plt.xlabel("Force du joueur (entre 0 et 1)")
+    plt.xlabel("Force du joueur")
     plt.ylabel("Dernier Elo du joueur")
     plt.title("Relation entre la force et le dernier Elo des joueurs")
     plt.grid(True)

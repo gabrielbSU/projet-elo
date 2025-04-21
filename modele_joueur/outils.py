@@ -74,3 +74,4 @@ def tirage_bernoulli(p):
     Tire un 1 avec probabilité p, sinon 0, en utilisant numpy.
     """
     return np.random.binomial(1, p)
+
