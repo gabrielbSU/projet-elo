@@ -1,26 +1,41 @@
 import random
-from .joueur import rencontre_modele1, rencontre_modele2
-def tournoi_round_robin(joueurs, jeu,  modele) :
+def tournoi_round_robin(joueurs, jeu, modele):
     """
     Organise un tournoi round robin où chaque joueur rencontre tous les autres joueurs une fois.
     Met à jour les elos et les historiques des parties des joueurs après chaque rencontre.
     """
-    victoires = {joueur: 0 for joueur in joueurs}
+    victoires = [0 for _ in joueurs]
 
     n = len(joueurs)
     for i in range(n):
         for j in range(i + 1, n):
-            if modele == 1:
-                S1, S2 = rencontre_modele1(joueurs[i], joueurs[j], jeu)
-            else:
-                S1, S2 = rencontre_modele2(joueurs[i], joueurs[j])
-                
-            if S1 == 1:
-                victoires[joueurs[i]] += 1
-            else:
-                victoires[joueurs[j]] += 1
+            j1, j2 = joueurs[i], joueurs[j]
 
-    return sorted(joueurs, key=lambda joueur: victoires[joueur], reverse=True)
+            if modele == 1:
+                # Modèle 1: Simulation
+                S1, S2 = rencontre_simu(j1, j2, jeu)
+                R1_new, R2_new = mettre_a_jour_elo_simu(j1, j2, S1, S2)
+            else:
+                # Modèle 2: Elo estimé
+                S1, S2 = rencontre_elo_estime(j1, j2)
+                R1_new, R2_new = mettre_a_jour_elo_estime(j1, j2, S1, S2)
+
+            # Mise à jour des victoires
+            if S1 == 1:
+                victoires[i] += 1
+            else:
+                victoires[j] += 1
+
+            # Mise à jour des historiques
+            j1.histo_partie = S1
+            j2.histo_partie = S2
+            j1.histo_elo = R1_new
+            j2.histo_elo = R2_new
+
+    # Trie les joueurs selon le nombre de victoires
+    joueurs_tries = sorted(joueurs, key=lambda j: victoires[j.id], reverse=True)
+    return joueurs_tries
+
 
 def tournoi_suisse(joueurs, jeu, nb_rounds=5, modele=1):
     """
@@ -50,9 +65,11 @@ def tournoi_suisse(joueurs, jeu, nb_rounds=5, modele=1):
                     joueur2 not in appariements[joueur1]):
                     # Faire jouer la partie
                     if modele == 1:
-                        S1, S2 = rencontre_modele1(joueur1, joueur2, jeu)
+                        S1, S2 = rencontre_simu(joueur1, joueur2, jeu)
+                        R1_new, R2_new = mettre_a_jour_elo_simu(j1, j2, S1, S2)
                     else:
-                        S1, S2 = rencontre_modele2(joueur1, joueur2)
+                        S1, S2 = rencontre_elo_estime(joueur1, joueur2)
+                        R1_new, R2_new = mettre_a_jour_elo_estime(j1, j2, S1, S2)
                     
                     # Mettre à jour les scores
                     scores[joueur1] += S1
