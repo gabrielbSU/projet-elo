@@ -1,4 +1,3 @@
-from.outils import sigmoid, tirage_bernoulli, mettre_a_jour_elo
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import norm
@@ -31,23 +30,23 @@ class Joueur:
 
     @property
     def histo_elo(self):
-        return self._histo_elo
+        return self.histo_elo
 
     @histo_elo.setter
     def histo_elo(self, nouveau_elo):
-        self._histo_elo.append(nouveau_elo)
+        self.histo_elo.append(nouveau_elo)
 
 
     @property
     def histo_partie(self):
-        return self._histo_partie
+        return self.histo_partie
 
     @histo_partie.setter
     def histo_partie(self, score):
-        self._histo_partie.append(score)
+        self.histo_partie.append(score)
     
 
-def generer_joueur(nom, prenom):
+def generer_joueur():
     """
     Génère un joueur avec des caractéristiques aléatoires selon différentes distributions :
     Compétences : log-normale (plus adapté qu'une gaussienne car on a plus de joueurs faibles et moyens que fort).

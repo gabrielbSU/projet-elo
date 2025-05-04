@@ -1,6 +1,3 @@
-from .joueur import get_proba_modele1, get_proba_modele2 
-from .jeu import Jeu
-from .outils import sigmoid
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
