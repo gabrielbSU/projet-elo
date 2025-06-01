@@ -12,3 +12,5 @@ https://www.glicko.net/glicko.html
 https://www.glicko.net/glicko/glicko.pdf
 
 https://en.wikipedia.org/wiki/Glicko_rating_system
+
+.

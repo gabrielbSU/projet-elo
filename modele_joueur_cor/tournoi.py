@@ -1,40 +1,38 @@
 import random
-def tournoi_round_robin(joueurs, jeu, modele):
+from modele_joueur_cor.simu import rencontre_simu, mettre_a_jour_elo_simu
+from modele_joueur_cor.estimation import rencontre_elo_estime, mettre_a_jour_elo_estime
+
+from itertools import combinations
+
+def tournoi_round_robin(joueurs, jeu, mode="simu"):
     """
-    Organise un tournoi round robin où chaque joueur rencontre tous les autres joueurs une fois.
-    Met à jour les elos et les historiques des parties des joueurs après chaque rencontre.
+    Organise un tournoi round-robin selon le mode choisi : simulation ou estimation.
+    
+    Args:
+        joueurs (list): Liste des objets Joueur.
+        jeu (object): Contient taux_de_hasard et impact_hasard.
+        mode (str): "simu" ou "estimation".
+    
+    Returns:
+        list of tuple: Liste des matchs (joueur1, joueur2, score1, score2)
     """
-    victoires = [0 for _ in joueurs]
+    matchs = []
 
-    n = len(joueurs)
-    for i in range(n):
-        for j in range(i + 1, n):
-            j1, j2 = joueurs[i], joueurs[j]
+    for joueur1, joueur2 in combinations(joueurs, 2):
+        if mode == "simu":
+            S1, S2 = rencontre_simu(joueur1, joueur2, jeu)
+            mettre_a_jour_elo_simu(joueur1, joueur2, jeu, S1, S2)
 
-            if modele == 1:
-                # Modèle 1: Simulation
-                S1, S2 = rencontre_simu(j1, j2, jeu)
-                R1_new, R2_new = mettre_a_jour_elo_simu(j1, j2, S1, S2)
-            else:
-                # Modèle 2: Elo estimé
-                S1, S2 = rencontre_elo_estime(j1, j2)
-                R1_new, R2_new = mettre_a_jour_elo_estime(j1, j2, S1, S2)
+        elif mode == "estimation":
+            S1, S2 = rencontre_elo_estime(joueur1, joueur2)
+            mettre_a_jour_elo_estime(joueur1, joueur2)
 
-            # Mise à jour des victoires
-            if S1 == 1:
-                victoires[i] += 1
-            else:
-                victoires[j] += 1
+        else:
+            raise ValueError("Mode inconnu. Utilisez 'simu' ou 'estimation'.")
 
-            # Mise à jour des historiques
-            j1.histo_partie = S1
-            j2.histo_partie = S2
-            j1.histo_elo = R1_new
-            j2.histo_elo = R2_new
-
-    # Trie les joueurs selon le nombre de victoires
-    joueurs_tries = sorted(joueurs, key=lambda j: victoires[j.id], reverse=True)
-    return joueurs_tries
+        matchs.append((joueur1, joueur2, S1, S2))
+    
+    return matchs
 
 
 def tournoi_suisse(joueurs, jeu, nb_rounds=5, modele=1):
@@ -66,10 +64,10 @@ def tournoi_suisse(joueurs, jeu, nb_rounds=5, modele=1):
                     # Faire jouer la partie
                     if modele == 1:
                         S1, S2 = rencontre_simu(joueur1, joueur2, jeu)
-                        R1_new, R2_new = mettre_a_jour_elo_simu(j1, j2, S1, S2)
+                        mettre_a_jour_elo_simu(joueur1, joueur2, jeu, S1, S2)
                     else:
                         S1, S2 = rencontre_elo_estime(joueur1, joueur2)
-                        R1_new, R2_new = mettre_a_jour_elo_estime(j1, j2, S1, S2)
+                        mettre_a_jour_elo_estime(joueur1, joueur2)
                     
                     # Mettre à jour les scores
                     scores[joueur1] += S1
@@ -86,3 +84,4 @@ def tournoi_suisse(joueurs, jeu, nb_rounds=5, modele=1):
     classement = sorted(joueurs, key=lambda j: (-scores[j], -j.histo_elo[-1]))
     
     return classement
+

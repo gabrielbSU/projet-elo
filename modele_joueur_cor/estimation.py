@@ -1,68 +1,74 @@
-def get_proba_estime(elo1,elo2) :
-    diff = elo2-elo1
-    return 1/(1+10**(diff/400))
+import random
+from modele_joueur_cor.simu import tirage_bernoulli
+
+from constantes import K
+
+def get_proba_estime(elo1, elo2):
+    """
+    Calcule la probabilité de victoire du joueur1 sur joueur2 selon leur Elo.
+    """
+    diff = elo2 - elo1
+    return 1 / (1 + 10 ** (diff / 400))
+
 
 def rencontre_elo_estime(joueur1, joueur2):
     """
-    Simule une partie entre deux joueurs en se basant uniquement sur leur Elo
+    Simule une partie entre deux joueurs selon leurs Elos uniquement.
+    Retourne le score sous forme (S1, S2).
     """
-    # Récupération des Elos actuels
-    elo1 = joueur1.histo_elo[-1]  # Dernier Elo du joueur 1
-    elo2 = joueur2.histo_elo[-1]  # Dernier Elo du joueur 2
+    elo1 = joueur1.histo_elo[-1]
+    elo2 = joueur2.histo_elo[-1]
 
-    # Calcul des probabilités selon la formule de l'Elo
-    P1 = get_proba_estime(elo1,elo2)  # Probabilité de victoire du joueur 1
-    P2 = 1 - P1  # Probabilité de victoire du joueur 2 (complémentaire)
+    P1 = get_proba_estime(elo1, elo2)
 
-    if P1 > P2:
-        S1 = 1
-        S2 = 0
-    elif P1 < P2:
-        S1 = 0
-        S2 = 1
-    return S1, S2
+    if P1 > 0.5:
+        return 1, 0
+    elif P1 < 0.5:
+        return 0, 1
+    else:
+        # En cas d'égalité parfaite, tirage aléatoire
+        return tirage_bernoulli(0.5), tirage_bernoulli(0.5)
 
-    # Mise à jour des Elos des joueurs
-    # mettre_a_jour_elo(joueur1, joueur2, S1, S2, P1, P2)
 
-    return S1, S2
-
-#Fonction qui met à jour l'elo des joueurs après une partie (modéle 1)
-def mettre_a_jour_elo_estime(joueur1, joueur2) :
+def mettre_a_jour_elo_estime(joueur1, joueur2):
     """
-    Met à jour l'elo des deux joueurs après une partie.
+    Met à jour l'Elo des deux joueurs après leur rencontre simulée sur base des Elos.
     """
-    P1,P2 = get_proba_estime(joueur1.histo_elo[-1], joueur2.histo_elo[-1]), 1 - get_proba_estime(joueur1.histo_elo[-1], joueur2.histo_elo[-1])
+    elo1_last = joueur1.histo_elo[-1]
+    elo2_last = joueur2.histo_elo[-1]
+
+    P1 = get_proba_estime(elo1_last, elo2_last)
+    P2 = 1 - P1
+
     S1, S2 = rencontre_elo_estime(joueur1, joueur2)
 
-    elo1 = joueur1.histo_elo[-1] + K * (S1 - P1)
-    elo2 = joueur2.histo_elo[-1] + K * (S2 - P2)
+    new_elo1 = elo1_last + K * (S1 - P1)
+    new_elo2 = elo2_last + K * (S2 - P2)
 
-    # Mise à jour de l'historique des parties et des elos
     joueur1.histo_partie = S1
     joueur2.histo_partie = S2
 
-    joueur1.histo_elo = elo1
-    joueur2.histo_elo = elo2
+    joueur1.histo_elo = new_elo1
+    joueur2.histo_elo = new_elo2
+
 
 def vraisemblance_estime_elo(joueurs, n_parties):
-    vraisemblance_totale = 1.0  # Initialisation à 1 (multiplication des probabilités)
+    """
+    Calcule la vraisemblance globale d'un ensemble de rencontres entre joueurs selon leur Elo.
+    """
+    vraisemblance_totale = 1.0
 
     for _ in range(n_parties):
         joueur1, joueur2 = random.sample(joueurs, 2)
-        
-        # Calcul des probabilités de victoire selon les Elos
+
         P1 = get_proba_estime(joueur1.histo_elo[-1], joueur2.histo_elo[-1])
         P2 = 1 - P1
-        
-        # Tirage du résultat réel de la rencontre
+
         S1 = tirage_bernoulli(P1)
         S2 = 1 - S1
-        
-        # Vraisemblance pour cette rencontre
+
         vraisemblance_totale *= P1**S1 * P2**S2
 
-        # Mise à jour des Elos des joueurs
         mettre_a_jour_elo_estime(joueur1, joueur2)
 
     return vraisemblance_totale
