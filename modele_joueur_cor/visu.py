@@ -31,15 +31,17 @@ def tracer_forces(joueurs):
     plt.grid(True)
     plt.show()
 
-def tracer_elo(joueurs):
+def tracer_elo(joueurs,mode):
     """
     Trace l'histogramme des derniers Elo des joueurs.
     """
     if not joueurs:
         print("Aucun joueur à afficher.")
         return
-
-    elo = [joueur.histo_elo[-1] for joueur in joueurs if joueur.histo_elo]
+    if mode == "simu":
+        elo = [joueur.histo_elo_simu[-1] for joueur in joueurs if joueur.histo_elo_simu]
+    elif mode == "estimation":
+        elo = [joueur.histo_elo_estimation[-1] for joueur in joueurs if joueur.histo_elo_estimation]
 
     if not elo:
         print("Aucun Elo valide à afficher.")
@@ -63,7 +65,7 @@ def tracer_force_elo(joueurs):
     - joueurs : liste d'objets Joueur
     """
     forces = [joueur.force for joueur in joueurs]
-    elos = [joueur.histo_elo[-1] for joueur in joueurs if joueur.histo_elo]
+    elos = [joueur.histo_elo_simu[-1] for joueur in joueurs if joueur.histo_elo_simu]
 
     if not elos:
         print("Aucun Elo valide à afficher.")

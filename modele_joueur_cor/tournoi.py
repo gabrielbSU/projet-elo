@@ -19,13 +19,13 @@ def tournoi_round_robin(joueurs, jeu, mode="simu"):
     matchs = []
 
     for joueur1, joueur2 in combinations(joueurs, 2):
+        f1, f2 = joueur1.force, joueur2.force
+        S1, S2 = rencontre_simu(f1, f2, jeu)
         if mode == "simu":
-            S1, S2 = rencontre_simu(joueur1, joueur2, jeu)
             mettre_a_jour_elo_simu(joueur1, joueur2, jeu, S1, S2)
 
         elif mode == "estimation":
-            S1, S2 = rencontre_elo_estime(joueur1, joueur2)
-            mettre_a_jour_elo_estime(joueur1, joueur2)
+            mettre_a_jour_elo_estime(joueur1, joueur2, S1, S2)
 
         else:
             raise ValueError("Mode inconnu. Utilisez 'simu' ou 'estimation'.")

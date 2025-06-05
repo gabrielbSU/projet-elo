@@ -3,16 +3,16 @@ from modele_joueur_cor import *
 liste_joueurs = [generer_joueur() for _ in range(100)]
 
 tracer_forces(liste_joueurs)
-tracer_elo(liste_joueurs)
+tracer_elo(liste_joueurs, mode ='simu')
 
 poker = Jeu('Poker', taux_de_hasard=0.1, impact_hasard=0.5)
 
-tournoi1 = tournoi_round_robin(liste_joueurs, poker, modele=1)
+tournoi1 = tournoi_round_robin(liste_joueurs, poker, mode = 'simu')
 
-for _ in range(10) :
-    tournoi1 = tournoi_round_robin(tournoi1, poker, modele=1)
+# for _ in range(10) :
+#     tournoi1 = tournoi_round_robin(tournoi1, poker, mode = 'estimation')
 
-tracer_elo(liste_joueurs)
+# tracer_elo(liste_joueurs)
 
 
 ## Les 2 tracés suivants sont incohérents ##
