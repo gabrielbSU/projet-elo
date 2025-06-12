@@ -68,8 +68,10 @@ def generer_joueur():
 
 def modifie_hasard(taux, impact_force_hasard, f1):
     """conditions intiales : modifie_hasard(taux, impact_force_hasard, 0) = 0 et modifie_hasard(taux, impact_force_hasard, 1) = taux"""
-    a = (2 * taux * (1 + np.exp(-impact_force_hasard))) / (1 - np.exp(-impact_force_hasard))
-    b = -a / 2
+    #a = (2 * taux * (1 + np.exp(-impact_force_hasard))) / (1 - np.exp(-impact_force_hasard))
+    #b = -a / 2
+    a = (taux-1)/(1/np.exp(-impact_force_hasard)-0.5)
+    b = 1 - a/2
     return a / (1 + np.exp(-impact_force_hasard * f1)) + b
 
 def get_proba_simu(f1, f2, jeu):
