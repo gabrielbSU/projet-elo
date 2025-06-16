@@ -54,7 +54,7 @@ class Joueur:
 
 
 def generer_joueur():
-    x = np.random.lognormal(mean=-0.5, sigma=0.5)
+    x = np.random.lognormal(mean=1.0, sigma=0.5)
     force = 1 / (1 + np.exp(-np.log(x)))  # sigmoid(log(x)) == x / (1 + x)
     
     histo_partie = []
@@ -66,60 +66,49 @@ def generer_joueur():
     return Joueur(force, histo_partie, histo_elo_simu, histo_elo_estimation, histo_glicko_simu, histo_glicko_estimation)
 
 
-def modifie_hasard(taux, impact_force_hasard, fmax):
-    eps = 1e-8  # sécurité numérique
-    denom = 1 / np.exp(-impact_force_hasard + eps) - 0.5
-    denom = np.clip(denom, eps, None)
-    a = (taux - 1) / denom
-    b = 1 - a / 2
-    result = a / (1 + np.exp(-impact_force_hasard * fmax)) + b
-    return np.clip(result, 0, 1)
+def modifie_hasard(taux, impact_force_hasard, f1):
+    """conditions intiales : modifie_hasard(taux, impact_force_hasard, 0) = 0 et modifie_hasard(taux, impact_force_hasard, 1) = taux"""
+    #a = (2 * taux * (1 + np.exp(-impact_force_hasard))) / (1 - np.exp(-impact_force_hasard))
+    #b = -a / 2
+    a = (taux-1)/(1/np.exp(-impact_force_hasard)-0.5)
+    b = 1 - a/2
+    return a / (1 + np.exp(-impact_force_hasard * f1)) + b
+
+def get_proba_simu(f1, f2, jeu):
+    """passage au log si on veut linéariser la modification du hasard"""
+
+    ## proba inversée !
+
+    diff = abs(f1 - f2)
+    mf = np.maximum(f1, f2)
+    k_hasard = -np.log(modifie_hasard(jeu.taux_de_hasard, jeu.impact_force_hasard, mf))   #on rajoute un - car log(x) < 0 pour x dans ]0,1]
+    return sigmoid(diff, k=k_hasard * 10 * diff)
 
 
 def sigmoid(x, k=10):
     return 1 / (1 + np.exp(-k * x))
 
 
-def get_proba_simu(f1, f2, taux, impact):
-    diff = np.abs(f1 - f2)
-    mf = np.maximum(f1, f2)
-    k_hasard = -np.log(modifie_hasard(taux, impact, mf))
-    return sigmoid(diff, k=k_hasard * 300 * diff)
-
-
 def tirage_bernoulli(p):
     return np.random.binomial(1, p)
 
 
-def rencontre_simu(f1, f2, jeu):
-    p = get_proba_simu(f1, f2, jeu.taux_de_hasard, jeu.impact_force_hasard)  # proba que le plus fort gagne
-    gagnant_est_plus_fort = tirage_bernoulli(p)
-
-    if f1 > f2:
-        return (1, 0) if gagnant_est_plus_fort else (0, 1)
-    else:
-        return (0, 1) if gagnant_est_plus_fort else (1, 0)
-
-
+def rencontre_simu(f1,f2, jeu):
+    P1 = get_proba_simu(f1, f2, jeu)
+    S1 = tirage_bernoulli(P1)
+    S2 = 1 - S1
+    return S1, S2
 
 
 def mettre_a_jour_elo_simu(joueur1, joueur2, jeu, S1, S2):
-    # Probabilité que joueur1 gagne
-    P1 = get_proba_simu(joueur1.force, joueur2.force, jeu.taux_de_hasard, jeu.impact_force_hasard)
+    P1 = get_proba_simu(joueur1.force, joueur2.force, jeu)
     P2 = 1 - P1
-
-    # Mise à jour ELO
     elo1 = joueur1.histo_elo_simu[-1] + K * (S1 - P1)
     elo2 = joueur2.histo_elo_simu[-1] + K * (S2 - P2)
-
-    # Historique des scores
     joueur1.histo_partie = S1
     joueur2.histo_partie = S2
-
-    # Historique ELO simulé
-    joueur1.histo_elo_simu = elo1
-    joueur2.histo_elo_simu = elo2
-
+    joueur1.histo_elo = elo1
+    joueur2.histo_elo = elo2
 
 
 def mettre_a_jour_glicko_simu(joueur, partie, jeu):

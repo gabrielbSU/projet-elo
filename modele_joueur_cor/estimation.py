@@ -21,14 +21,10 @@ def rencontre_elo_estime(joueur1, joueur2):
 
     P1 = get_proba_estime(elo1, elo2)
 
-    if P1 > 0.5:
+    if P1 >= 0.5:
         return 1, 0
     elif P1 < 0.5:
         return 0, 1
-    else:
-        # En cas d'égalité parfaite, tirage aléatoire
-        return tirage_bernoulli(0.5), tirage_bernoulli(0.5)
-
 
 def mettre_a_jour_elo_estime(joueur1, joueur2,S1,S2):
     """
@@ -109,3 +105,5 @@ def update_glicko_all_players(joueurs, matchs, date):
         infos[j2.id].append((r1, rd1, s2))
     for j in joueurs:
         mettre_a_jour_glicko(j, infos[j.id], date)
+
+

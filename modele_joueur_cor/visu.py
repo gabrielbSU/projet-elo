@@ -57,76 +57,74 @@ def tracer_elo(joueurs,mode):
     plt.grid(True)
     plt.show()
 
-def tracer_force_elo(joueurs):
-    """
-    Trace un graphique montrant la relation entre la force des joueurs et leur dernier Elo.
-    
-    Paramètres :
-    - joueurs : liste d'objets Joueur
-    """
+def tracer_force_elo(joueurs, mode="simu"):
     forces = [joueur.force for joueur in joueurs]
-    elos = [joueur.histo_elo_simu[-1] for joueur in joueurs if joueur.histo_elo_simu]
 
-    if not elos:
-        print("Aucun Elo valide à afficher.")
-        return
+    if mode == "simu":
+        elos = [joueur.histo_elo_simu[-1] for joueur in joueurs]
+    elif mode == "estimation":
+        elos = [joueur.histo_elo_estimation[-1] for joueur in joueurs]
+    else:
+        raise ValueError("Mode inconnu. Utilisez 'simu' ou 'estimation'.")
 
-    plt.figure(figsize=(10, 6))
-    sns.scatterplot(x=forces, y=elos, alpha=0.7)
-
-    plt.xlabel("Force du joueur")
-    plt.ylabel("Dernier Elo du joueur")
-    plt.title("Relation entre la force et le dernier Elo des joueurs")
+    plt.figure(figsize=(8, 6))
+    sns.scatterplot(x=forces, y=elos)
+    sns.regplot(x=forces, y=elos, scatter=False, color='red', label='Régression')
+    plt.xlabel("Force réelle du joueur")
+    plt.ylabel("ELO estimé")
+    plt.title(f"Corrélation entre force réelle et ELO ({mode})")
+    plt.legend()
     plt.grid(True)
-
+    plt.tight_layout()
     plt.show()
 
-def tracer_evolution_elo(joueur):
-    """
-    Trace l'évolution de l'Elo d'un joueur au fil du temps.
-    
-    Paramètres :
-    - joueur : objet de la classe Joueur
-    """
-    if not joueur.histo_elo:
+
+def tracer_evolution_elo(joueur, mode="simu"):
+    if mode == "simu":
+        hist = joueur.histo_elo_simu
+    elif mode == "estimation":
+        hist = joueur.histo_elo_estimation
+    else:
+        raise ValueError("Mode inconnu. Utilisez 'simu' ou 'estimation'.")
+
+    if not hist:
         print(f"Aucun historique Elo pour {joueur.id}.")
         return
 
     plt.figure(figsize=(10, 6))
-    plt.plot(joueur.histo_elo, marker='o', linestyle='-', color='b', label="Évolution de l'Elo")
-    
+    plt.plot(hist, marker='o', linestyle='-', label=f"Évolution Elo ({mode})")
     plt.xlabel("Nombre de parties")
     plt.ylabel("Elo")
-    plt.title(f"Évolution de l'Elo de {joueur.id}")
+    plt.title(f"Évolution de l'Elo de {joueur.id} ({mode})")
     plt.legend()
     plt.grid(True)
-    
     plt.show()
 
-def tracer_comparaison_evolution_elo(joueurs):
-    """
-    Trace l'évolution de l'Elo de plusieurs joueurs sur le même graphique.
 
-    Paramètres :
-    - joueurs : liste d'objets Joueur
-    """
+def tracer_comparaison_evolution_elo(joueurs, mode="simu"):
     if not joueurs:
         print("Aucun joueur à afficher.")
         return
 
     plt.figure(figsize=(12, 7))
-
     for joueur in joueurs:
-        if joueur.histo_elo:  # Vérifie que l'historique n'est pas vide
-            plt.plot(joueur.histo_elo, marker='o', linestyle='-', label=f"{joueur.id}")
+        if mode == "simu":
+            hist = joueur.histo_elo_simu
+        elif mode == "estimation":
+            hist = joueur.histo_elo_estimation
+        else:
+            raise ValueError("Mode inconnu. Utilisez 'simu' ou 'estimation'.")
+
+        if hist:
+            plt.plot(hist, marker='o', linestyle='-', label=f"{joueur.id}")
 
     plt.xlabel("Nombre de parties")
     plt.ylabel("Elo")
-    plt.title("Évolution de l'Elo des joueurs")
+    plt.title(f"Évolution de l'Elo des joueurs ({mode})")
     plt.legend()
     plt.grid(True)
-
     plt.show()
+
 
 def visualiser_plusieurs_sigmoides(k_list=[5, 10, 20, 50]):
     """
