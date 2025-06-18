@@ -1,13 +1,14 @@
 class Jeu:
-    """Classe représentant un jeu."""
+    """Classe représentant un jeu avec une part de hasard."""
 
     def __init__(self, nom, taux_de_hasard, impact_force_hasard=1.0):
         """
-        :param nom: Nom du jeu
-        :param taux_de_hasard: Le taux de hasard (entre 0 et 1)
-        :param impact_hasard: Impact maximal du hasard (par défaut 1.0, ajustable)
+        :param nom: Nom du jeu.
+        :param taux_de_hasard: Le taux de hasard (entre 0 et 1).
+        :param impact_force_hasard: Impact du hasard selon la différence de force (>= 0).
         """
         self.nom = nom
+
         if not (0 <= taux_de_hasard <= 1):
             raise ValueError("taux_de_hasard doit être entre 0 et 1")
         self.taux_de_hasard = taux_de_hasard

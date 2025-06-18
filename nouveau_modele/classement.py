@@ -44,82 +44,47 @@ class SystemeGlicko:
         new_rating = r + self.Q / (1 / rd ** 2 + 1 / d2) * delta_sum
         self.historique.append((new_rating, new_rd))
 
-
 class SystemeGlicko2:
-    def __init__(self, rating=1500, rd=350, vol=0.06):
-        self.mu = (rating - 1500) / 173.7178
-        self.phi = rd / 173.7178
-        self.sigma = vol
-        self.tau = 0.5
-        self.historique = [(rating, rd, vol)]
+    def __init__(self, rating=1500, rd=350, sigma=0.06):
+        self.r = (rating - 1500) / 173.7178  # Échelle Glicko-2
+        self.rd = rd / 173.7178
+        self.sigma = sigma
+        self.historique = [(self.get_rating()[0], self.get_rating()[1])]
 
     def get_rating(self):
-        r = 173.7178 * self.mu + 1500
-        rd = 173.7178 * self.phi
-        return (r, rd, self.sigma)
+        # Conversion en échelle Glicko classique
+        return 173.7178 * self.r + 1500, self.rd * 173.7178
 
-    def _g(self, phi):
+    def g(self, phi):
         return 1 / math.sqrt(1 + 3 * phi**2 / math.pi**2)
 
-    def _E(self, mu, muj, phij):
-        return 1 / (1 + math.exp(-self._g(phij) * (mu - muj)))
-
-    def _f(self, x, delta, phi, v):
-        a = math.log(self.sigma**2)
-        ex = math.exp(x)
-        num = ex * (delta**2 - phi**2 - v - ex)
-        denom = 2 * (phi**2 + v + ex)**2
-        return (num / denom) - ((x - a) / self.tau**2)
+    def E(self, mu, mu_j, phi_j):
+        return 1 / (1 + math.exp(-self.g(phi_j) * (mu - mu_j)))
 
     def update(self, adversaires, scores):
-        if not adversaires:
-            self.phi = math.sqrt(self.phi**2 + self.sigma**2)
-            self.historique.append(self.get_rating())
-            return
-
-        mu = self.mu
-        phi = self.phi
-        sigma = self.sigma
-
+        mu, phi, sigma = self.r, self.rd, self.sigma
         v_inv = 0
         delta_num = 0
-        for (rj, rdj, _), score in zip(adversaires, scores):
-            muj = (rj - 1500) / 173.7178
-            phij = rdj / 173.7178
-            g = self._g(phij)
-            E = self._E(mu, muj, phij)
-            v_inv += (g**2) * E * (1 - E)
-            delta_num += g * (score - E)
+
+        for (rj, rdj), score in zip(adversaires, scores):
+            mu_j = (rj - 1500) / 173.7178
+            phi_j = rdj / 173.7178
+            E_ = self.E(mu, mu_j, phi_j)
+            g_ = self.g(phi_j)
+            v_inv += (g_**2) * E_ * (1 - E_)
+            delta_num += g_ * (score - E_)
+
+        if v_inv == 0:
+            self.historique.append(self.get_rating())
+            return
 
         v = 1 / v_inv
         delta = v * delta_num
 
-        a = math.log(sigma**2)
-        A = a
-        eps = 1e-6
-        B = math.log(sigma**2 + 1)
+        phi_star = math.sqrt(phi**2 + sigma**2)
+        phi_new = 1 / math.sqrt(1 / phi_star**2 + 1 / v)
+        mu_new = mu + phi_new**2 * delta_num
 
-        fA = self._f(A, delta, phi, v)
-        fB = self._f(B, delta, phi, v)
-
-        while abs(B - A) > eps:
-            C = A + (A - B) * fA / (fB - fA)
-            fC = self._f(C, delta, phi, v)
-            if fC * fB < 0:
-                A, fA = B, fB
-            else:
-                fA = fA / 2
-            B, fB = C, fC
-
-        new_sigma = math.exp(A / 2)
-        sigma_prime = new_sigma
-
-        phi_star = math.sqrt(phi**2 + sigma_prime**2)
-        phi_prime = 1 / math.sqrt(1 / phi_star**2 + 1 / v)
-        mu_prime = mu + phi_prime**2 * delta_num
-
-        self.mu = mu_prime
-        self.phi = phi_prime
-        self.sigma = sigma_prime
-
+        self.r = mu_new
+        self.rd = phi_new
         self.historique.append(self.get_rating())
