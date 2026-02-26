@@ -18,7 +18,7 @@ class Joueur:
 
     @staticmethod
     def generer_force():
-        x = np.random.lognormal(mean=-0.5, sigma=0.5)
+        x = np.random.lognormal(mean=-0.5, sigma=0.7)
         return 1 / (1 + np.exp(-np.log(x)))
 
     def enregistrer_score(self, score):
@@ -60,8 +60,10 @@ def rencontre_simu(f1, f2, jeu):
 
 
 def mettre_a_jour_elo_simu(j1, j2, jeu, S1, S2):
-    j1.elo.update(j2.elo.rating, S1)
-    j2.elo.update(j1.elo.rating, S2)
+    r1 = j1.elo.rating
+    r2 = j2.elo.rating
+    j1.elo.update(r2, S1)
+    j2.elo.update(r1, S2)
     j1.enregistrer_score(S1)
     j2.enregistrer_score(S2)
 

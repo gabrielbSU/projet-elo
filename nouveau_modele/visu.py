@@ -1,7 +1,13 @@
 import matplotlib.pyplot as plt
 import seaborn as sns
-from scipy.stats import spearmanr, mannwhitneyu, wilcoxon
+from scipy.stats import spearmanr, mannwhitneyu, wilcoxon, kendalltau
 import pandas as pd
+from sklearn.linear_model import LinearRegression
+import numpy as np
+
+
+from simu import Joueur
+from tournoi import *
 
 
 def tracer_elo(joueurs, mode="simu"):
@@ -89,11 +95,22 @@ def tracer_evolution_glicko2(joueur):
 
 
 def tracer_correlation_force_elo(joueurs):
-    forces = [j.force for j in joueurs]
-    elos = [j.elo.rating for j in joueurs]
+
+    forces = np.array([j.force for j in joueurs]).reshape(-1, 1)
+    elos = np.array([j.elo.rating for j in joueurs])
+
+    model = LinearRegression()
+    model.fit(forces, elos)
+
+    r_squared = model.score(forces, elos)
+    coef = model.coef_[0]
+    intercept = model.intercept_
+
+    print(f"[Régression Elo] pente = {coef:.4f}, intercept = {intercept:.2f}, R² = {r_squared:.4f}")
+
     plt.figure(figsize=(10, 6))
-    sns.scatterplot(x=forces, y=elos)
-    sns.regplot(x=forces, y=elos, scatter=False, color='red', label='Régression')
+    sns.scatterplot(x=forces.flatten(), y=elos)
+    sns.regplot(x=forces.flatten(), y=elos, scatter=False, color='red', label='Régression')
     plt.xlabel("Force réelle")
     plt.ylabel("Elo estimé")
     plt.title("Corrélation entre la force réelle et l'Elo")
@@ -103,11 +120,22 @@ def tracer_correlation_force_elo(joueurs):
 
 
 def tracer_correlation_force_glicko(joueurs):
-    forces = [j.force for j in joueurs]
-    ratings = [j.glicko.get_rating()[0] for j in joueurs]
+
+    forces = np.array([j.force for j in joueurs]).reshape(-1, 1)
+    ratings = np.array([j.glicko.get_rating()[0] for j in joueurs])
+
+    model = LinearRegression()
+    model.fit(forces, ratings)
+
+    r_squared = model.score(forces, ratings)
+    coef = model.coef_[0]
+    intercept = model.intercept_
+
+    print(f"[Régression Glicko] pente = {coef:.4f}, intercept = {intercept:.2f}, R² = {r_squared:.4f}")
+
     plt.figure(figsize=(10, 6))
-    sns.scatterplot(x=forces, y=ratings)
-    sns.regplot(x=forces, y=ratings, scatter=False, color='orange', label='Régression')
+    sns.scatterplot(x=forces.flatten(), y=ratings)
+    sns.regplot(x=forces.flatten(), y=ratings, scatter=False, color='orange', label='Régression')
     plt.xlabel("Force réelle")
     plt.ylabel("Rating Glicko")
     plt.title("Corrélation entre la force réelle et le rating Glicko")
@@ -117,17 +145,29 @@ def tracer_correlation_force_glicko(joueurs):
 
 
 def tracer_correlation_force_glicko2(joueurs):
-    forces = [j.force for j in joueurs]
-    ratings = [j.glicko2.get_rating()[0] for j in joueurs]
+
+    forces = np.array([j.force for j in joueurs]).reshape(-1, 1)
+    ratings = np.array([j.glicko2.get_rating()[0] for j in joueurs])
+
+    model = LinearRegression()
+    model.fit(forces, ratings)
+
+    r_squared = model.score(forces, ratings)
+    coef = model.coef_[0]
+    intercept = model.intercept_
+
+    print(f"[Régression Glicko-2] pente = {coef:.4f}, intercept = {intercept:.2f}, R² = {r_squared:.4f}")
+
     plt.figure(figsize=(10, 6))
-    sns.scatterplot(x=forces, y=ratings)
-    sns.regplot(x=forces, y=ratings, scatter=False, color='green', label='Régression')
+    sns.scatterplot(x=forces.flatten(), y=ratings)
+    sns.regplot(x=forces.flatten(), y=ratings, scatter=False, color='green', label='Régression')
     plt.xlabel("Force réelle")
     plt.ylabel("Rating Glicko-2")
     plt.title("Corrélation entre la force réelle et le rating Glicko-2")
     plt.legend()
     plt.grid(True)
     plt.show()
+
 
 
 def afficher_spearman(joueurs, systeme="elo"):
@@ -261,3 +301,138 @@ def tracer_comparaisons_scatter(joueurs):
 
     plt.tight_layout()
     plt.show()
+
+
+def tracer_spearman_comparatif(nb_tournois=100, nb_joueurs=100, nb_matchs_par_tournoi=1000, jeu=None):
+    """
+    Simule plusieurs tournois successifs pour chaque système de classement (Elo, Glicko, Glicko2)
+    et trace sur un même graphique l'évolution du coefficient de Spearman.
+    """
+
+    import matplotlib.pyplot as plt
+    from scipy.stats import spearmanr
+    from simu import Joueur
+    from tournoi import tournoi_suisse
+    from jeu import Jeu
+
+    if jeu is None:
+        jeu = Jeu(nom="TournoiSimu", taux_de_hasard=0.3, impact_force_hasard=1.0)
+
+    modes = ["elo", "glicko", "glicko2"]
+    courbes = {}
+
+    for mode in modes:
+        joueurs = [Joueur() for _ in range(nb_joueurs)]
+        spearman_evolution = []
+        for i in range(nb_tournois):
+            tournoi_suisse(joueurs, jeu, nb_rounds=5, mode=mode)
+            if mode == "elo":
+                notes = [j.elo.rating for j in joueurs]
+            elif mode == "glicko":
+                notes = [j.glicko.get_rating()[0] for j in joueurs]
+            elif mode == "glicko2":
+                notes = [j.glicko2.get_rating()[0] for j in joueurs]
+            forces = [j.force for j in joueurs]
+            coeff, _ = spearmanr(forces, notes)
+            spearman_evolution.append(coeff)
+        courbes[mode] = spearman_evolution
+
+    # Tracé comparatif
+    plt.figure(figsize=(12, 7))
+    for mode in modes:
+        plt.plot(range(1, nb_tournois + 1), courbes[mode], label=mode, marker='o', linewidth=2)
+
+    plt.xlabel("Numéro du tournoi")
+    plt.ylabel("Coefficient de Spearman")
+    plt.title(f"Évolution comparative de Spearman sur {nb_tournois} tournois")
+    plt.grid(True)
+    plt.ylim(-1, 1)
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
+
+
+def afficher_kendall(joueurs, systeme="elo"):
+    """
+    Affiche le tau de Kendall entre la force réelle et le classement estimé.
+    """
+    if systeme == "elo":
+        notes = [j.elo.rating for j in joueurs]
+    elif systeme == "glicko":
+        notes = [j.glicko.get_rating()[0] for j in joueurs]
+    elif systeme == "glicko2":
+        notes = [j.glicko2.get_rating()[0] for j in joueurs]
+    else:
+        raise ValueError("Système inconnu. Utilisez 'elo', 'glicko' ou 'glicko2'.")
+
+    forces = [j.force for j in joueurs]
+    coeff, p_value = kendalltau(forces, notes)
+
+    print(f"Kendall's tau ({systeme}) : {coeff:.4f} (p-value = {p_value:.4g})")
+
+
+def tracer_kendall_comparatif(nb_tournois=100, nb_joueurs=100, nb_matchs_par_tournoi=1000, jeu=None):
+    """
+    Simule plusieurs tournois successifs pour chaque système de classement (Elo, Glicko, Glicko2)
+    et trace sur un même graphique l'évolution du tau de Kendall.
+    """
+    import matplotlib.pyplot as plt
+    from scipy.stats import kendalltau
+    from simu import Joueur
+    from tournoi import tournoi_suisse
+    from jeu import Jeu
+
+    if jeu is None:
+        jeu = Jeu(nom="TournoiSimu", taux_de_hasard=0.3, impact_force_hasard=1.0)
+
+    modes = ["elo", "glicko", "glicko2"]
+    courbes = {}
+
+    for mode in modes:
+        joueurs = [Joueur() for _ in range(nb_joueurs)]
+        kendall_evolution = []
+        for i in range(nb_tournois):
+            tournoi_suisse(joueurs, jeu, nb_rounds=5, mode=mode)
+
+            if mode == "elo":
+                notes = [j.elo.rating for j in joueurs]
+            elif mode == "glicko":
+                notes = [j.glicko.get_rating()[0] for j in joueurs]
+            elif mode == "glicko2":
+                notes = [j.glicko2.get_rating()[0] for j in joueurs]
+
+            forces = [j.force for j in joueurs]
+            coeff, _ = kendalltau(forces, notes)
+            kendall_evolution.append(coeff)
+        courbes[mode] = kendall_evolution
+
+    # Tracé comparatif
+    plt.figure(figsize=(12, 7))
+    for mode in modes:
+        plt.plot(range(1, nb_tournois + 1), courbes[mode], label=mode, marker='o', linewidth=2)
+
+    plt.xlabel("Numéro du tournoi")
+    plt.ylabel("Tau de Kendall")
+    plt.title(f"Évolution comparative du tau de Kendall sur {nb_tournois} tournois")
+    plt.grid(True)
+    plt.ylim(-1, 1)
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
+
+
+def tracer_distribution_forces(joueurs):
+    """
+    Trace la distribution des forces réelles des joueurs.
+    """
+    forces = [j.force for j in joueurs]
+
+    plt.figure(figsize=(10, 6))
+    sns.histplot(forces, bins=20, kde=True, color='gray')
+    plt.title("Distribution des forces réelles des joueurs")
+    plt.xlabel("Force")
+    plt.ylabel("Fréquence")
+    plt.grid(True)
+    plt.show()
+
+
