@@ -62,7 +62,7 @@ Des tournois simulés sont ensuite exécutés afin d’observer :
 
 ---
 
-## 📊 Analyses réalisées
+## Analyses réalisées
 
 Les expérimentations mesurent notamment :
 
