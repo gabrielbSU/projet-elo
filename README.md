@@ -1,113 +1,106 @@
-🎯 Projet LU2IN013
-Exploration du comportement des systèmes de rating (Elo, Glicko, Glicko-2)
-📌 À propos du projet
+# 🎯 Projet LU2IN013  
+## Exploration du comportement des systèmes de rating (Elo, Glicko, Glicko-2)
+
+---
+
+## 📌 Description
 
 Ce projet étudie le comportement comparé de trois systèmes de rating largement utilisés dans les environnements compétitifs :
 
-Elo
+- **Elo**
+- **Glicko**
+- **Glicko-2**
 
-Glicko
+L’objectif est d’analyser leur capacité à estimer fidèlement le niveau réel des joueurs à partir de simulations contrôlées.
 
-Glicko-2
+Le rapport complet disponible dans ce dépôt présente en détail :
+- Les fondements théoriques des systèmes
+- La modélisation probabiliste des rencontres
+- Les protocoles expérimentaux
+- Les résultats et analyses statistiques
 
-L’objectif est d’analyser leur capacité à estimer fidèlement le niveau réel des joueurs à partir de simulations contrôlées de tournois.
+---
 
-Le rapport complet disponible dans le dépôt détaille :
+## 🧠 Contexte
 
-Les fondements théoriques des systèmes
+Les systèmes de rating jouent un rôle central dans de nombreux contextes compétitifs (échecs, e-sport, jeux en ligne, compétitions sportives).  
+Ils attribuent à chaque joueur une valeur numérique censée refléter son niveau réel à partir de ses performances passées.
 
-Les choix de modélisation probabiliste
+Dans ce projet, nous cherchons à comprendre :
 
-Les protocoles expérimentaux
+- À quelle vitesse chaque système converge vers le niveau réel ?
+- Comment réagissent-ils face à des joueurs instables ou intermittents ?
+- Quelle est leur robustesse face au hasard ?
+- Comment évoluent les distributions des ratings au cours du temps ?
 
-Les analyses statistiques approfondies
+---
 
-🧠 Contexte
+## ⚙️ Méthodologie
 
-Les systèmes de rating jouent un rôle fondamental dans de nombreux contextes compétitifs : échecs, e-sport, jeux en ligne, compétitions sportives, etc.
-Ils cherchent à attribuer à chaque joueur une valeur numérique reflétant son niveau réel à partir de ses performances passées.
+Notre approche repose sur deux axes principaux :
 
-Dans ce projet, nous cherchons à répondre aux questions suivantes :
+### 1️⃣ Implémentation rigoureuse des systèmes
 
-À quelle vitesse chaque système converge-t-il vers le niveau réel ?
+Chaque système (Elo, Glicko, Glicko-2) est implémenté conformément à sa définition théorique.
 
-Comment réagissent-ils face à des joueurs instables ou intermittents ?
-
-Quel système est le plus robuste face au hasard ?
-
-Comment évoluent les distributions des ratings au cours du temps ?
-
-⚙️ Approche méthodologique
-
-Notre démarche repose sur une double approche :
-
-1️⃣ Implémentation fidèle des systèmes
-
-Chaque système (Elo, Glicko, Glicko-2) est implémenté en respectant strictement sa formalisation théorique.
-
-2️⃣ Simulation probabiliste de tournois
+### 2️⃣ Simulation probabiliste de tournois
 
 Nous générons :
 
-Des joueurs avec compétences réelles aléatoires
+- Des joueurs avec une **compétence réelle aléatoire**
+- Des **ratings initiaux aléatoires**
+- Un modèle de confrontation intégrant :
+  - Une part de hasard contrôlable
+  - Une probabilité de victoire dépendant du différentiel de niveau
 
-Des ratings initiaux aléatoires
+Des tournois simulés sont ensuite exécutés afin d’observer :
 
-Un modèle probabiliste de confrontation intégrant :
+- La vitesse de convergence
+- La stabilité des classements
+- L’écart entre compétence réelle et rating estimé
+- L’évolution statistique des distributions
 
-Une part de hasard contrôlable
+---
 
-Une sensibilité au différentiel de niveau
+## 🧪 Profils de joueurs étudiés
 
-Nous simulons ensuite des tournois répétés afin d’observer :
+Les simulations permettent d’analyser différents comportements :
 
-La vitesse de convergence
+- 🔁 Joueurs réguliers  
+- 🎲 Joueurs imprévisibles  
+- ⏳ Joueurs intermittents  
+- 📈 Joueurs en progression  
+- 🎯 Spécialistes vs généralistes  
 
-La stabilité des classements
+---
 
-L’erreur entre compétence réelle et rating estimé
+## 📊 Analyses réalisées
 
-La dispersion des distributions
+Les expérimentations mesurent notamment :
 
-🧪 Profils de joueurs étudiés
+- L’erreur moyenne entre compétence réelle et rating
+- Le temps nécessaire pour obtenir un classement fidèle
+- La stabilité du système face aux fluctuations
+- La dispersion des ratings
+- La robustesse face au bruit aléatoire
 
-Les simulations permettent d’analyser différents types de joueurs :
+---
 
-🔁 Joueurs réguliers
+## 📁 Contenu du dépôt
 
-🎲 Joueurs imprévisibles
+- Implémentation des systèmes de rating
+- Génération de joueurs et de tournois simulés
+- Scripts d’expérimentations
+- Visualisations statistiques
+- 📄 Rapport complet (analyse théorique et résultats détaillés)
 
-⏳ Joueurs intermittents
+---
 
-📈 Joueurs en progression
+## 🎓 Cadre académique
 
-🎯 Spécialistes vs généralistes
+Projet réalisé dans le cadre de l’UE **LU2IN013**.
 
-📊 Analyses réalisées
+Le code permet de reproduire les simulations.  
+Le rapport fournit une analyse complète et détaillée des résultats expérimentaux.
 
-Les expériences permettent de mesurer :
-
-L’erreur moyenne entre compétence réelle et rating
-
-Le temps nécessaire pour obtenir un classement fidèle
-
-La stabilité du système face aux fluctuations
-
-L’évolution statistique des distributions
-
-📁 Contenu du dépôt
-
-Implémentation des systèmes de rating
-
-Génération de joueurs et de tournois simulés
-
-Scripts d’expérimentations
-
-Visualisations statistiques
-
-📄 Rapport complet (analyse détaillée et résultats)
-
-🎓 Cadre académique
-
-Projet réalisé dans le cadre de l’UE LU2IN013.
-Le dépôt contient l’ensemble du travail expérimental ; le rapport fournit une analyse théorique et statistique approfondie.
+---
