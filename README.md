@@ -1,48 +1,113 @@
-# projet-LU2IN013
-Exploration du comportement des systèmes de rating (Elo, Glicko, Glicko-2) en fonction des capacités des joueurs
+🎯 Projet LU2IN013
+Exploration du comportement des systèmes de rating (Elo, Glicko, Glicko-2)
+📌 À propos du projet
 
-## Description
-Ce projet explore le comportement des systèmes de rating tels que Elo, Glicko et Glicko-2 en fonction des capacités des joueurs. Il permet de générer des joueurs avec des compétences et des elo aléatoires, de simuler des rencontres entre eux et de visualiser les distributions des compétences et des elo.
+Ce projet étudie le comportement comparé de trois systèmes de rating largement utilisés dans les environnements compétitifs :
 
-## Installation
-Pour exécuter ce projet, vous aurez besoin de Python 3 et des bibliothèques suivantes :
-- numpy
-- matplotlib
-- seaborn
-- scipy
+Elo
 
-## Description des classes et des fonctions
+Glicko
 
-## Classe Joueur
-__init__(self, nom, prenom, age, comp, histo_partie, histo_tournoi, elo):
-Initialise un joueur avec son nom, prénom, âge, compétences, historique des parties, historique des tournois et elo.
+Glicko-2
 
-categorie(self): Retourne la catégorie du joueur en fonction de son elo.
+L’objectif est d’analyser leur capacité à estimer fidèlement le niveau réel des joueurs à partir de simulations contrôlées de tournois.
 
-afficher_joueur(self): Affiche les informations du joueur.
+Le rapport complet disponible dans le dépôt détaille :
 
-get_elo(self): Retourne l'elo du joueur.
+Les fondements théoriques des systèmes
 
-force_joueur(self): Retourne la force d'un joueur entre 0 et 1.
+Les choix de modélisation probabiliste
 
-force_relative(self, joueur_adverse): Renvoie le couple (f1, f2) des forces relatives entre 2 joueurs.
+Les protocoles expérimentaux
 
-rencontre(self, joueur_adverse): Simule une partie entre deux joueurs et renvoie le résultat.
+Les analyses statistiques approfondies
 
-comparaison_rencontre_elo(self, joueur_adverse): Renvoie True si le résultat de la rencontre est conforme aux prédictions de l'elo, False sinon.
+🧠 Contexte
 
-generer_joueur(nom, prenom): Génère un joueur avec des caractéristiques aléatoires.
+Les systèmes de rating jouent un rôle fondamental dans de nombreux contextes compétitifs : échecs, e-sport, jeux en ligne, compétitions sportives, etc.
+Ils cherchent à attribuer à chaque joueur une valeur numérique reflétant son niveau réel à partir de ses performances passées.
 
-tracer_competences(joueurs): Trace l'histogramme et la densité des compétences des joueurs.
+Dans ce projet, nous cherchons à répondre aux questions suivantes :
 
-tracer_elo(joueurs): Trace l'histogramme et la densité des elo des joueurs.
+À quelle vitesse chaque système converge-t-il vers le niveau réel ?
 
-tracer_competences_et_elo(joueurs): Trace les densités des compétences et des elo sur le même graphique.
+Comment réagissent-ils face à des joueurs instables ou intermittents ?
 
-## Classe Outils
-probabilite_victoire(f1, f2, sigma=1): Calcule la probabilité que le joueur 1 gagne en fonction des forces relatives f1 et f2.
+Quel système est le plus robuste face au hasard ?
 
-probabilite_victoire_avec_hasard(f1, f2, sigma=1, sigma_hasard=0.2): Calcule la probabilité que le joueur 1 gagne en ajoutant un facteur de hasard.
+Comment évoluent les distributions des ratings au cours du temps ?
 
+⚙️ Approche méthodologique
 
+Notre démarche repose sur une double approche :
 
+1️⃣ Implémentation fidèle des systèmes
+
+Chaque système (Elo, Glicko, Glicko-2) est implémenté en respectant strictement sa formalisation théorique.
+
+2️⃣ Simulation probabiliste de tournois
+
+Nous générons :
+
+Des joueurs avec compétences réelles aléatoires
+
+Des ratings initiaux aléatoires
+
+Un modèle probabiliste de confrontation intégrant :
+
+Une part de hasard contrôlable
+
+Une sensibilité au différentiel de niveau
+
+Nous simulons ensuite des tournois répétés afin d’observer :
+
+La vitesse de convergence
+
+La stabilité des classements
+
+L’erreur entre compétence réelle et rating estimé
+
+La dispersion des distributions
+
+🧪 Profils de joueurs étudiés
+
+Les simulations permettent d’analyser différents types de joueurs :
+
+🔁 Joueurs réguliers
+
+🎲 Joueurs imprévisibles
+
+⏳ Joueurs intermittents
+
+📈 Joueurs en progression
+
+🎯 Spécialistes vs généralistes
+
+📊 Analyses réalisées
+
+Les expériences permettent de mesurer :
+
+L’erreur moyenne entre compétence réelle et rating
+
+Le temps nécessaire pour obtenir un classement fidèle
+
+La stabilité du système face aux fluctuations
+
+L’évolution statistique des distributions
+
+📁 Contenu du dépôt
+
+Implémentation des systèmes de rating
+
+Génération de joueurs et de tournois simulés
+
+Scripts d’expérimentations
+
+Visualisations statistiques
+
+📄 Rapport complet (analyse détaillée et résultats)
+
+🎓 Cadre académique
+
+Projet réalisé dans le cadre de l’UE LU2IN013.
+Le dépôt contient l’ensemble du travail expérimental ; le rapport fournit une analyse théorique et statistique approfondie.
